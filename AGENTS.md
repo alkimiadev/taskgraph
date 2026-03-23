@@ -74,6 +74,33 @@ CLI args → Command →
 - [ ] TUI mode (optional)
 - [ ] MCP server for LLM integration
 
+## Available Tools
+
+### Core
+| Tool | Description |
+|------|-------------|
+| `read`, `write`, `edit` | File operations |
+| `bash` | Shell commands |
+| `glob`, `grep` | File search |
+| `task` | Spawn sub-agents for research |
+
+### Web Research
+| Tool | Description |
+|------|-------------|
+| `webSearch_search` | Web search (DuckDuckGo, Bing, Exa) |
+| `webFetch` | Fetch URL content |
+
+### Git Worktrees (open-trees plugin)
+Enable: `worktree_mode { "action": "on" }`
+
+| Tool | Description |
+|------|-------------|
+| `worktree_make` | Create/open worktrees |
+| `worktree_overview` | List worktrees |
+| `worktree_cleanup` | Remove worktrees |
+
+See `docs/implementation.md` for full details.
+
 ## Development Patterns
 
 ### Testing Standards
@@ -210,7 +237,15 @@ taskgraph/
 ├── README.md
 ├── AGENTS.md              # This file
 ├── docs/
-│   └── ARCHITECTURE.md    # Full architecture spec
+│   ├── ARCHITECTURE.md    # Full architecture spec
+│   ├── implementation.md  # Tools, models, guidelines
+│   ├── phase-1.md         # Phase 1 tasks
+│   ├── phase-2.md         # Phase 2 tasks
+│   ├── phase-3.md         # Phase 3 tasks (semantic search)
+│   ├── phase-4.md         # Phase 4 tasks
+│   ├── issues/            # Blocking issues (safe exit)
+│   ├── reviews/           # Code review documentation
+│   └── research/          # Reference implementations
 ├── src/
 │   ├── main.rs
 │   ├── lib.rs

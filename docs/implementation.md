@@ -84,11 +84,15 @@ All are open models (MIT/Apache-2.0) hosted by Alibaba Cloud.
 ```
 docs/
 ├── ARCHITECTURE.md     # Full architecture (source of truth)
+├── implementation.md   # This file - tools and guidelines
 ├── phase-1.md          # Phase 1 implementation details
 ├── phase-2.md          # Phase 2 implementation details
 ├── phase-3.md          # Phase 3 implementation details (feature-gated)
 ├── phase-4.md          # Phase 4 implementation details
-├── implementation.md   # This file - tools and guidelines
+├── issues/             # Blocking issues (safe exit mechanism)
+│   └── README.md
+├── reviews/            # Code review documentation
+│   └── README.md
 └── research/           # Research notes, reference implementations
     └── context_branching.md
 ```
@@ -97,6 +101,21 @@ docs/
 - Implementation details → `phase-N.md`
 - Research/reference → `docs/research/`
 - Architecture changes → `ARCHITECTURE.md`
+- Blocking issues → `docs/issues/` (create issue file)
+- Code reviews → `docs/reviews/` (create review file)
+
+## Safe Exit Mechanism
+
+When encountering a blocking issue that cannot be resolved:
+
+1. **Create issue file** in `docs/issues/`
+2. **Document the problem** - what you tried, what blocked you
+3. **Move on** - don't force impossible tasks
+4. **Return later** - after resolution
+
+See `docs/issues/README.md` for template and process.
+
+Forcing agents to complete impossible tasks causes problems. Better to document and pause.
 
 ## Dependency Sources
 
