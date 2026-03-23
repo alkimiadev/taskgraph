@@ -7,9 +7,9 @@
 
 ## Problem
 
-Test coverage is 20.89%, well below the 80% target.
+Test coverage was 20.89%, well below the 80% target.
 
-**Coverage breakdown:**
+**Initial coverage breakdown:**
 
 | Module | Lines | Coverage | Issue |
 |--------|-------|----------|-------|
@@ -23,15 +23,31 @@ Test coverage is 20.89%, well below the 80% target.
 
 ## Root Cause
 
-Only unit tests exist. No integration tests exercising CLI command paths.
+Only unit tests existed. No integration tests exercising CLI command paths.
 
-## Suggested Resolution
+## Resolution
 
-1. Add integration tests with `assert_cmd` (already in dev-dependencies)
-2. Add graph module unit tests
-3. Add embedding roundtrip tests
-4. Add cache tests
+**Progress (2026-03-23):**
 
-## Priority
+1. Added 16 graph module unit tests
+2. Added 6 cache module unit tests  
+3. Added 10 embedding module tests (including roundtrip)
+4. Added 14 integration tests with `assert_cmd`
 
-High - Blocking Phase 5 release readiness.
+**Current coverage: 68.40%** (up from 20.89%)
+
+| Module | Lines | Coverage | Status |
+|--------|-------|----------|--------|
+| `graph.rs` | 379 | 98.42% | ✅ |
+| `cache.rs` | 57 | 100.00% | ✅ |
+| `embedding.rs` | 329 | 87.23% | ✅ |
+| `discovery.rs` | 160 | 85.62% | ✅ |
+| `cli.rs` | 75 | 61.33% | ⚠️ |
+| `task.rs` | 104 | 37.50% | ⚠️ |
+| `commands/*.rs` | ~400 | ~60% | ⚠️ Mixed |
+
+## Remaining Work
+
+- [ ] Add more integration tests for edge cases
+- [ ] Improve task.rs coverage (more Task parsing tests)
+- [ ] Add semantic feature integration tests (requires model)
