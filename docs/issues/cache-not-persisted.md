@@ -23,18 +23,44 @@ Commands::Cache { command } => match command {
 **Current behavior:**
 - Both commands just print messages
 
+## Analysis
+
+### Why Cache?
+
+Cache helps when:
+1. Graph rebuild is expensive (1000+ tasks)
+2. Frequent invocations (watch mode, MCP server)
+
+### When Cache is Unnecessary
+
+- < 100 tasks: rebuild is ~instant
+- One-off queries: cache overhead > savings
+- CI/CD: fresh state each run
+
+### Current Performance
+
+**Unknown** - needs benchmarking.
+
 ## Options
 
-1. **Implement cache persistence** - Add actual file read/write
-2. **Remove cache commands** - Until cache is actually needed
-3. **Leave as stub** - Document as TODO for later
+1. **Benchmark first** - Measure reparse time at 100/500/1000 tasks before deciding
+2. **Implement cache** - Add persistence if benchmarks show need
+3. **Remove cache commands** - YAGNI until proven otherwise
 
 ## Recommendation
 
-Option 2: Remove or stub out cache commands. The cache system isn't critical for Phase 1-3 functionality. TaskGraph can rebuild the graph on each invocation (fast enough for typical task counts).
+**Option 1: Benchmark first.**
 
-If performance becomes an issue with 1000+ tasks, implement in Phase 5 (Performance).
+```bash
+# Create test datasets
+for n in 100 500 1000; do
+  # generate $n task files
+  time taskgraph topo
+done
+```
+
+If reparse is < 100ms for 1000 tasks, cache is premature optimization.
 
 ## Priority
 
-Low - Not blocking any functionality.
+Low - Not blocking any functionality. Revisit in Phase 4 (Performance) with data.

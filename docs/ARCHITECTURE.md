@@ -60,21 +60,6 @@ TaskGraph supports the [Spec-Driven Development (SDD) framework](/workspace/@alk
     taskgraph parallel       # Review before parallel groups merge
     ```
 
-### Future: Reactive Server Mode
-
-Phase 4+ could add a lightweight server with pubsub for fully reactive workflows:
-
-```
-taskgraph server --watch
-
-# Agents subscribe to events:
-# - task_completed → trigger downstream tasks
-# - task_blocked → notify coordinator
-# - community_completed → trigger review
-```
-
-This enables "automagically reactive" orchestration where the graph drives agent behavior.
-
 ## Implementation Phases
 
 ### Phase 1: Core CLI & Validation ✅
@@ -101,10 +86,26 @@ This enables "automagically reactive" orchestration where the graph drives agent
 
 ### Phase 4: Polish & Extensions
 
+- Configuration system (TOML)
+- Documentation and shell completion
+- Performance optimization (benchmark, parallel parsing)
 - File watching (`--watch`)
-- TUI mode (optional)
-- MCP server for LLM integration
 - Distribution (cargo publish, binaries)
+
+### Future: Reactive Server Mode (Optional)
+
+A lightweight server with pubsub could enable fully reactive workflows:
+
+```
+taskgraph server --watch
+
+# Agents subscribe to events:
+# - task_completed → trigger downstream tasks
+# - task_blocked → notify coordinator
+# - community_completed → trigger review
+```
+
+This is optional - CLI-first design covers most use cases.
 
 ### Semantic Search
 
@@ -421,8 +422,6 @@ taskgraph/
 
 ## Future Considerations
 
-- **File watching**: `--watch` flag for live updates
-- **TUI mode**: Interactive terminal interface
-- **Web UI**: Optional web interface for visualization
-- **MCP server**: Model Context Protocol for LLM integration
+- **File watching**: `--watch` flag for live updates (Phase 4)
+- **Reactive server**: Optional pubsub mode for event-driven workflows
 - **Plugins**: Extension system for custom commands
