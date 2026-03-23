@@ -372,8 +372,8 @@ Header JSON:
   },
   "index": {
     "dtype": "U8",
-    "shape": [N, 16],
-    "data_offsets": [N*D*4, N*D*4 + N*16]
+    "shape": [N, 24],
+    "data_offsets": [N*D*4, N*D*4 + N*24]
   }
 }
 ```
@@ -382,16 +382,28 @@ Header JSON:
 
 ### Index Struct Layout
 
-16 bytes per window, C-style packed struct:
+24 bytes per window, C-style packed struct:
 
 ```rust
 #[repr(C, packed)]
 struct WindowIndex {
-    file_path_hash: u64,  // 8 bytes - xxHash3 of file path
-    window_start: u32,    // 4 bytes - token start position
-    window_end: u32,      // 4 bytes - token end position
+    file_path_hash: u64,       // 8 bytes - xxHash3 of file path
+    window_start_token: u32,   // 4 bytes - token start position
+    window_end_token: u32,     // 4 bytes - token end position
+    window_start_char: u32,    // 4 bytes - character offset in file
+    window_end_char: u32,      // 4 bytes - character offset in file
 }
 ```
+
+**Why both token and char positions:**
+
+| Use Case | Position Type | Benefit |
+|----------|---------------|---------|
+| Token consistency | `*_token` | Verify window is exactly 512 tokens |
+| User display | `*_char` | Direct text slice: `text[start..end]` |
+| Cross-model compat | `*_char` | Works even if tokenization differs |
+
+**Storage cost:** 24 bytes per window vs 16 bytes. For 1000 windows = 24KB overhead - negligible.
 
 **File path hash vs task ID hash:**
 - Using file path hash is more general

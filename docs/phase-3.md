@@ -47,7 +47,7 @@ For v1, just report token positions. Line mapping is a future enhancement.
 #### Storage Format
 - [ ] Create `.taskgraph/embeddings.safetensors`
 - [ ] Tensor: `embeddings` [N, D] F32 where D = model embedding dim
-- [ ] Tensor: `index` [N, 16] U8 (struct tensor)
+- [ ] Tensor: `index` [N, 24] U8 (struct tensor)
 - [ ] Memory-mapped access for fast reads
 
 #### Metadata (in safetensor `__metadata__` field)
@@ -65,14 +65,24 @@ For v1, just report token positions. Line mapping is a future enhancement.
 - [ ] Detect model mismatch (rebuild needed?)
 - [ ] Enable `embed --status` to show model used
 
-#### Index Struct Layout (16 bytes)
+#### Index Struct Layout (24 bytes)
 ```
-[file_path_hash: u64][window_start: u32][window_end: u32]
+[file_path_hash: u64][start_token: u32][end_token: u32][start_char: u32][end_char: u32]
 ```
 - [ ] Hash **file path** with xxHash3 (not task_id - more general)
 - [ ] Enables reuse for memories, notes, any markdown collection
 - [ ] Store hash → path mapping in cache.json
 - [ ] Pack/unpack struct tensor
+
+**Why both token and char positions:**
+
+| Use Case | Position Type | Benefit |
+|----------|---------------|---------|
+| Token consistency | `*_token` | Verify window is exactly 512 tokens |
+| User display | `*_char` | Direct text slice: `text[start..end]` |
+| Cross-model compat | `*_char` | Works even if tokenization differs |
+
+Storage: 24 bytes per window. For 1000 windows = 24KB - negligible.
 
 ### 3.4 Commands
 
