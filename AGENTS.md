@@ -59,21 +59,30 @@ CLI args → Command →
 - [ ] Output formatting (plain, JSON)
 
 ### Phase 2: Graph Operations
-- [ ] Graph building from task files
+- [x] Graph building from task files
 - [ ] Cache system (`.taskgraph/cache.json`)
-- [ ] Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`
+- [x] Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`
 - [ ] Workflow analysis: `risk`, `risk-path`, `decompose-check`, `workflow-cost`
-- [ ] DOT format output for visualization
+- [x] DOT format output for visualization
 
 ### Phase 3: Semantic Search (Feature-gated)
-- [ ] Rolling window embeddings
-- [ ] Safetensor storage (embeddings + struct tensor index)
-- [ ] `search` command with similarity scoring
+- [x] Rolling window embeddings
+- [x] Safetensor storage (embeddings + struct tensor index)
+- [x] `search` command with similarity scoring
+- [x] `embed` command for building index
 
-### Phase 4: Polish & Extensions
+### Phase 4: Cleanup & Review
+- [ ] Test coverage improvement (target: 80%)
+- [ ] Integration tests with `assert_cmd`
+- [ ] Graph algorithm unit tests
+- [ ] Code review and documentation
+- [ ] Resolve documented issues
+
+### Phase 5: Polish & Extensions
 - [ ] File watching (`--watch`)
 - [ ] TUI mode (optional)
 - [ ] MCP server for LLM integration
+- [ ] Distribution (cargo publish, binaries)
 
 ## Available Tools
 

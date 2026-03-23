@@ -1,104 +1,76 @@
-# Phase 4: Polish & Extensions
+# Phase 4: Cleanup & Review
 
 ## Objective
 
-Production-ready CLI with advanced features.
-
-## Priority Order
-
-Based on the SDD framework use case and "assumption points" analysis:
-
-1. **Configuration** - Needed for any non-trivial use
-2. **MCP Server** - Directly serves the SDD use case
-3. **Documentation** - Required for release
-4. **Performance** - Needed for large task sets
-5. **File Watching** - Enables reactive workflows
-6. **TUI Mode** - Nice to have, lower priority
-7. **Distribution** - Final step
+Address technical debt, improve test coverage, and ensure production readiness before advanced features.
 
 ## Tasks
 
-### 4.1 Configuration
-- [ ] Global config: `~/.config/taskgraph/config.toml`
-- [ ] Project config: `.taskgraph/config.toml`
-- [ ] Settings: default path, model, output format
-- [ ] Config precedence: project > global > defaults
+### 4.1 Test Coverage
 
-### 4.2 MCP Server
-- [ ] Model Context Protocol server mode
-- [ ] Expose as MCP tools for LLM integration
-- [ ] `taskgraph mcp` subcommand
-- [ ] Stdio transport (same as other MCP servers)
-- [ ] Tools: list, show, topo, cycles, parallel, critical, search
+**Current: 20.89% | Target: 80%**
 
-### 4.3 Documentation
-- [ ] README with installation, quick start, examples
-- [ ] Shell completion (bash, zsh, fish) via clap
-- [ ] Example task files
-- [ ] Example workflows (SDD integration)
+- [ ] Add integration tests using `assert_cmd`
+  - [ ] `validate` command
+  - [ ] `list` command with filters
+  - [ ] `topo` command
+  - [ ] `show` command
+  - [ ] Error cases (missing task, invalid path)
 
-### 4.4 Performance
-- [ ] Profile hot paths
-- [ ] Parallel file parsing with rayon
-- [ ] Handle 1000+ tasks gracefully
-- [ ] Cache efficiency metrics
+- [ ] Add unit tests for `graph.rs`
+  - [ ] Topological sort
+  - [ ] Cycle detection
+  - [ ] Parallel groups
+  - [ ] Critical path
+  - [ ] Betweenness centrality
 
-### 4.5 File Watching
-- [ ] `taskgraph watch` subcommand
-- [ ] Monitor task directory
-- [ ] Emit events on changes
-- [ ] Optional: rebuild cache automatically
-- [ ] Integration with reactive workflows (pubsub?)
+- [ ] Add unit tests for `cache.rs`
+  - [ ] Has changed detection
+  - [ ] Mtime tracking
 
-### 4.6 TUI Mode (Optional)
-- [ ] `taskgraph tui` subcommand
-- [ ] Interactive task list
-- [ ] Dependency graph visualization
-- [ ] Status updates in real-time
-- [ ] Lower priority - editors exist
+- [ ] Add roundtrip test for embedding index
+  - [ ] Create index → save → load → verify
 
-### 4.7 Testing & Quality
-- [ ] Integration tests with example task directories
-- [ ] Property-based tests for parsers
-- [ ] Coverage > 80%
-- [ ] Fuzz testing for edge cases
+### 4.2 Code Review
 
-### 4.8 Distribution
-- [ ] Release builds (Linux, macOS, Windows)
-- [ ] Cargo publish
-- [ ] GitHub releases with binaries
-- [ ] Homebrew formula (optional)
-- [ ] AUR package (optional)
+- [ ] Review `commands/*.rs` for error handling consistency
+- [ ] Review `embedding.rs` for edge cases
+- [ ] Review `graph.rs` for algorithm correctness
+- [ ] Review all public API documentation
 
-## Assumption Points (Resolved)
+### 4.3 Missing Features Review
 
-| Question | Decision |
-|----------|----------|
-| Watch implementation | `notify` crate - standard, well-maintained |
-| TUI necessity | Lower priority. Editors + CLI covers most use cases |
-| MCP priority | High - directly serves SDD use case |
-| Config format | TOML - human-friendly, standard for Rust tools |
-| Distribution | Cargo primary, GitHub releases for binaries |
+Per `docs/issues/incomplete-workflow-commands.md`:
+- [ ] Review if `risk` command is needed
+- [ ] Review if `risk-path` command is needed
+- [ ] Review if `decompose-check` command is needed
+- [ ] Review if `workflow-cost` command is needed
 
-## Dependencies (New)
+### 4.4 Documentation Review
 
-| Crate | Purpose |
-|-------|---------|
-| `notify` | File watching |
-| `toml` | Config parsing |
-| `ratatui` | TUI (optional) |
+- [ ] Verify README accuracy
+- [ ] Check ARCHITECTURE.md reflects current state
+- [ ] Update phase docs with completion status
+- [ ] Add inline code documentation where missing
 
-### Reference Sources (after cargo build)
+### 4.5 Code Quality
 
-```
-~/.cargo/registry/src/*/notify-*/      - file system watching patterns
-~/.cargo/registry/src/*/toml-*/        - TOML parsing
-~/.cargo/registry/src/*/ratatui-*/     - TUI building (if implementing)
+- [ ] Run `cargo clippy --all-features -- -D warnings`
+- [ ] Run `cargo fmt --check`
+- [ ] Remove dead code (if any)
+- [ ] Consolidate duplicate code patterns
+
+### 4.6 Performance Baseline
+
+- [ ] Benchmark task discovery (100, 1000 tasks)
+- [ ] Benchmark embedding generation
+- [ ] Benchmark search query time
+- [ ] Document performance characteristics
 
 ## Success Criteria
 
-- Stable 1.0 release
-- Documentation covers common workflows
-- Easy installation via cargo
-- Handles 1000+ tasks
-- MCP server works with common LLM tools
+- [ ] Test coverage ≥ 80%
+- [ ] All clippy warnings resolved
+- [ ] All documented issues reviewed
+- [ ] Performance baselines documented
+- [ ] Ready for Phase 5 (Polish & Extensions)
