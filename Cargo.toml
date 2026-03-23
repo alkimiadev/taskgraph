@@ -17,6 +17,10 @@ path = "src/lib.rs"
 name = "taskgraph"
 path = "src/main.rs"
 
+[[test]]
+name = "integration"
+path = "tests/integration/commands.rs"
+
 [dependencies]
 # Graph
 petgraph = "0.7"
