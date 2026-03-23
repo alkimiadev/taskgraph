@@ -36,9 +36,7 @@ impl Cache {
 
     /// Check if a file has changed since last cache.
     pub fn has_changed(&self, file: &str, mtime: u64) -> bool {
-        self.mtimes
-            .get(file)
-            .is_none_or(|&cached| cached != mtime)
+        self.mtimes.get(file).is_none_or(|&cached| cached != mtime)
     }
 
     /// Update the mtime for a file.

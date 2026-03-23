@@ -11,6 +11,9 @@ pub mod graph;
 pub mod output;
 pub mod task;
 
+#[cfg(feature = "semantic")]
+pub mod embedding;
+
 pub use cache::Cache;
 pub use discovery::{DiscoveryError, TaskCollection, ValidationResult};
 pub use error::{Error, Result};
