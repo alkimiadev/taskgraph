@@ -12,3 +12,8 @@ pub mod parallel;
 pub mod show;
 pub mod topo;
 pub mod validate;
+
+#[cfg(feature = "semantic")]
+pub mod embed;
+#[cfg(feature = "semantic")]
+pub mod search;

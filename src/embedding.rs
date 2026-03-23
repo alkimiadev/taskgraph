@@ -19,8 +19,7 @@ pub const DEFAULT_MODEL_ID: &str = "minishlab/potion-base-8M";
 
 /// Index entry for a single embedding window.
 ///
-/// 24 bytes packed structure for efficient storage.
-#[repr(C, packed)]
+/// 24 bytes when serialized to storage.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg(feature = "semantic")]
 pub struct WindowIndex {
