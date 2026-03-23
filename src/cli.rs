@@ -99,28 +99,6 @@ pub enum Commands {
         #[command(subcommand)]
         command: CacheCommands,
     },
-
-    /// Search tasks by semantic similarity
-    Search {
-        /// Search query
-        query: String,
-        /// Maximum number of results
-        #[arg(short = 'k', long, default_value = "10")]
-        top_k: usize,
-        /// Model to use for embeddings
-        #[arg(short, long)]
-        model: Option<String>,
-    },
-
-    /// Build or rebuild the embedding index
-    Embed {
-        /// Show embedding index status
-        #[arg(short, long)]
-        status: bool,
-        /// Model to use for embeddings
-        #[arg(short, long)]
-        model: Option<String>,
-    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -218,39 +196,6 @@ impl Cli {
                 CacheCommands::Clear => println!("Cache cleared"),
                 CacheCommands::Status => println!("Cache status"),
             },
-            Commands::Search {
-                query,
-                top_k,
-                model,
-            } => {
-                #[cfg(feature = "semantic")]
-                {
-                    crate::commands::search::execute(
-                        &self.tasks_path(),
-                        query,
-                        *top_k,
-                        model.as_deref(),
-                    )?;
-                }
-                #[cfg(not(feature = "semantic"))]
-                {
-                    let _ = (query, top_k, model);
-                    eprintln!("Semantic search requires the 'semantic' feature.");
-                    eprintln!("Enable with: cargo install taskgraph --features semantic");
-                }
-            }
-            Commands::Embed { status, model } => {
-                #[cfg(feature = "semantic")]
-                {
-                    crate::commands::embed::execute(&self.tasks_path(), *status, model.as_deref())?;
-                }
-                #[cfg(not(feature = "semantic"))]
-                {
-                    let _ = (status, model);
-                    eprintln!("Embedding requires the 'semantic' feature.");
-                    eprintln!("Enable with: cargo install taskgraph --features semantic");
-                }
-            }
         }
         Ok(())
     }

@@ -47,16 +47,15 @@ CLI args → Command →
 1. **One task = one file** - Natural concurrency, git-friendly
 2. **Frontmatter = YAML** - Human/LLM editable, typed via serde
 3. **Cache is optional** - Graph can be rebuilt on every query
-4. **CLI only, no server (Phase 1-3)** - Simplicity first
-5. **Semantic search = feature flag** - Optional heavy dependency
+4. **CLI only, no server** - Simplicity first
 
 ## Implementation Plan
 
 ### Phase 1: Core CLI & Validation
-- [ ] Project setup with dual MIT/Apache-2.0 license
-- [ ] Task file parsing (gray_matter + serde_yaml)
-- [ ] Commands: `init`, `validate`, `list`, `show`
-- [ ] Output formatting (plain, JSON)
+- [x] Project setup with dual MIT/Apache-2.0 license
+- [x] Task file parsing (gray_matter + serde_yaml)
+- [x] Commands: `init`, `validate`, `list`, `show`
+- [x] Output formatting (plain, JSON)
 
 ### Phase 2: Graph Operations
 - [x] Graph building from task files
@@ -65,24 +64,22 @@ CLI args → Command →
 - [ ] Workflow analysis: `risk`, `risk-path`, `decompose-check`, `workflow-cost`
 - [x] DOT format output for visualization
 
-### Phase 3: Semantic Search (Feature-gated)
-- [x] Rolling window embeddings
-- [x] Safetensor storage (embeddings + struct tensor index)
-- [x] `search` command with similarity scoring
-- [x] `embed` command for building index
-
-### Phase 4: Cleanup & Review
-- [ ] Test coverage improvement (target: 80%)
+### Phase 3: Cleanup & Review
+- [ ] Test coverage improvement (target: 80%, current: 68%)
 - [ ] Integration tests with `assert_cmd`
 - [ ] Graph algorithm unit tests
 - [ ] Code review and documentation
 - [ ] Resolve documented issues
 
-### Phase 5: Polish & Extensions
+### Phase 4: Polish & Extensions
 - [ ] File watching (`--watch`)
 - [ ] TUI mode (optional)
 - [ ] MCP server for LLM integration
 - [ ] Distribution (cargo publish, binaries)
+
+### Semantic Search
+
+Extracted to [taskgraph-semantic](../taskgraph-semantic/) for independent development.
 
 ## Available Tools
 
@@ -167,8 +164,7 @@ cargo test --doc --all-features        # Run doc tests
 ```bash
 cargo build
 cargo test
-cargo test --all-features
-cargo clippy --all-features
+cargo clippy
 cargo fmt --check
 ```
 
@@ -177,12 +173,11 @@ cargo fmt --check
 - Rust edition 2024 (or 2021 if 2024 not stable)
 - `anyhow` for error handling in CLI
 - `thiserror` for library error types
-- Feature flags for optional functionality (`semantic`)
 - `#![warn(missing_docs)]` after initial implementation
 
 ## Dependencies
 
-### Core (Phase 1-2)
+### Core
 
 | Crate | Purpose |
 |-------|---------|
@@ -195,15 +190,6 @@ cargo fmt --check
 | `dirs` | Platform directories |
 | `walkdir` | Directory scanning |
 | `tracing` | Logging |
-
-### Semantic Search (Phase 3, feature-gated)
-
-| Crate | Purpose |
-|-------|---------|
-| `model2vec-rs` | Static embedding model inference (git: alkimiadev fork) |
-| `safetensors` | Safetensor file format |
-| `ndarray` | Matrix operations |
-| `twox-hash` | Fast xxHash3 for file path hashing |
 
 ### Dependency Source Reference
 
@@ -236,6 +222,7 @@ When implementing, you can reference the source code for any dependency. For exa
 ### Related Projects
 - `/workspace/embedding_service/` - model2vec-rs embedding service
 - `/workspace/model2vec-rs/` - Forked model2vec with token counting
+- `/workspace/@alkimiadev/taskgraph-semantic/` - Semantic search layer (extracted)
 
 ## Directory Structure
 
@@ -251,7 +238,7 @@ taskgraph/
 │   ├── implementation.md  # Tools, models, guidelines
 │   ├── phase-1.md         # Phase 1 tasks
 │   ├── phase-2.md         # Phase 2 tasks
-│   ├── phase-3.md         # Phase 3 tasks (semantic search)
+│   ├── phase-3.md         # Phase 3 tasks
 │   ├── phase-4.md         # Phase 4 tasks
 │   ├── issues/            # Blocking issues (safe exit)
 │   ├── reviews/           # Code review documentation
@@ -272,9 +259,7 @@ taskgraph/
 
 ## Current Status
 
-**Phase 0: Setup - Complete**
-
-Ready to begin implementation.
+**Phase 1-2: Complete.** Phase 3 (cleanup) in progress.
 
 ## Implementation Guide
 
@@ -284,17 +269,6 @@ See `docs/implementation.md` for:
 - Available models
 - Document organization
 - External repository access
-
-## Parallel Development
-
-Phase 3 (semantic search) can be developed in parallel with Phase 1-2 using git worktrees:
-
-```bash
-worktree_mode { "action": "on" }
-worktree_make { "action": "create", "name": "phase-3-semantic" }
-```
-
-See `/workspace/open-trees/README.md` for worktree usage.
 
 ## License
 

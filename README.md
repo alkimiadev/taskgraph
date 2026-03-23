@@ -7,11 +7,7 @@ Each task is a single `.md` file with YAML frontmatter, making tasks version-con
 ## Installation
 
 ```bash
-# Basic installation
 cargo install taskgraph
-
-# With semantic search support
-cargo install taskgraph --features semantic
 ```
 
 ## Quick Start
@@ -93,41 +89,6 @@ Detailed description of the task goes here.
 | `bottleneck` | Show bottleneck tasks |
 | `graph` | Output graph in DOT format |
 
-### Semantic Search (requires `--features semantic`)
-
-| Command | Description |
-|---------|-------------|
-| `search <query>` | Search tasks by semantic similarity |
-| `embed` | Build the embedding index |
-| `embed --status` | Show embedding index info |
-
-## Semantic Search
-
-The semantic search feature enables finding tasks by meaning, not just keywords.
-
-```bash
-# Build the embedding index
-taskgraph embed
-
-# Search for tasks
-taskgraph search "authentication and login flow"
-taskgraph search "database schema changes" --top-k 5
-```
-
-### Requirements
-
-- Enable with `cargo install taskgraph --features semantic`
-- First run of `embed` will download the model (~8MB)
-- Uses `minishlab/potion-base-8M` by default
-
-### Custom Models
-
-```bash
-# Use a different model
-taskgraph embed --model minishlab/potion-base-32M
-taskgraph search "query" --model minishlab/potion-base-32M
-```
-
 ## Project Structure
 
 ```
@@ -137,9 +98,14 @@ project/
 │   ├── task-two.md
 │   └── ...
 └── .taskgraph/
-    ├── embeddings.safetensors  # Semantic search index
     └── cache.json              # Graph cache
 ```
+
+## Semantic Search
+
+Semantic search has been extracted to a separate crate: [taskgraph-semantic](https://github.com/alkimiadev/taskgraph-semantic).
+
+It provides embedding-based similarity search across task descriptions and can be used independently or integrated with taskgraph.
 
 ## License
 

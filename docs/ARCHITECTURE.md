@@ -92,19 +92,17 @@ This enables "automagically reactive" orchestration where the graph drives agent
 - Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`
 - DOT format output for visualization
 
-### Phase 3: Semantic Search (Feature-gated)
-
-- Rolling window embeddings
-- Safetensor storage for embeddings + index
-- `search` command with similarity scoring
-- Integration with model2vec-rs
-
-### Phase 4: Polish & Extensions
+### Phase 3: Polish & Extensions
 
 - File watching (`--watch`)
 - TUI mode (optional)
 - MCP server for LLM integration
 - Performance optimization
+
+### Semantic Search
+
+Semantic search has been extracted to a separate crate: [taskgraph-semantic](../taskgraph-semantic/).
+See that project for embedding-based similarity search across task descriptions.
 
 ## Core Concept
 
@@ -118,7 +116,6 @@ project/
 │   └── deployment.md
 └── .taskgraph/
     ├── cache.json
-    ├── embeddings.safetensors    # Phase 3
     └── logs/
 ```
 
@@ -245,14 +242,6 @@ taskgraph decompose-check        # Flag tasks that should be split (risk > mediu
 taskgraph workflow-cost          # Expected cost using cost-benefit framework
 ```
 
-### Semantic Search (Phase 3)
-
-```
-taskgraph search <query>         # Semantic search across task descriptions
-taskgraph embed --rebuild        # Rebuild embedding index
-taskgraph embed --status         # Show embedding index info
-```
-
 ## Dependency Model
 
 **Direction**: `depends_on` means "before me, this must be done"
@@ -293,9 +282,6 @@ This direction gives correct topological order: A, B, C
       "mtime": 1711185600
     }
   },
-  "file_path_hashes": {
-    "tasks/auth-setup.md": 18446744073709551615
-  },
   "graph": {
     "nodes": [...],
     "edges": [...]
@@ -303,7 +289,7 @@ This direction gives correct topological order: A, B, C
 }
 ```
 
-**Note**: Uses mtime only for invalidation (fast, good enough). `file_path_hashes` is for semantic search index lookups.
+**Note**: Uses mtime only for invalidation (fast, good enough).
 
 ### Cache Validation
 
@@ -317,122 +303,9 @@ This direction gives correct topological order: A, B, C
 - Manual: `taskgraph cache clear`
 - Automatic: File modification detected
 
-## Semantic Search (Phase 3)
-
-### Feature Flag
-
-```toml
-[features]
-default = []
-semantic = ["model2vec-rs", "safetensors", "ndarray", "twox-hash"]
-```
-
-### Rolling Window Embeddings
-
-For tasks with long descriptions, create overlapping token windows:
-
-```
-Task body: "Implement auth system with OAuth2, SAML, and JWT support..."
-
-Window 0: tokens[0:512]   → embedding_0
-Window 1: tokens[256:768] → embedding_1  (50% overlap)
-Window 2: tokens[512:1024] → embedding_2
-```
-
-**Benefits:**
-- No truncation loss for long descriptions
-- Query matches specific sections of a task
-- More granular similarity scoring
-
-### Safetensor Storage Format
-
-Store embeddings and index as pure tensors for memory-mapped access:
-
-```
-.taskgraph/embeddings.safetensors
-```
-
-**File structure:**
-```
-[8 bytes: header size (u64 LE)]
-[header_size bytes: JSON header]
-[tensor data: embeddings + index]
-
-Header JSON:
-{
-  "__metadata__": {
-    "model_id": "minishlab/potion-base-8M",
-    "embedding_dim": "256",
-    "window_size": "512",
-    "overlap": "0.5",
-    "created_at": "2026-03-23T12:00:00Z",
-    "file_count": "42"
-  },
-  "embeddings": {
-    "dtype": "F32",
-    "shape": [N, D],
-    "data_offsets": [0, N*D*4]
-  },
-  "index": {
-    "dtype": "U8",
-    "shape": [N, 24],
-    "data_offsets": [N*D*4, N*D*4 + N*24]
-  }
-}
-```
-
-**Note:** Embedding dimension D depends on model (256 for potion-base-8M, 384 for potion-base-32M, 768 for multilingual). Never hardcode - read from metadata or tensor shape.
-
-### Index Struct Layout
-
-24 bytes per window, C-style packed struct:
-
-```rust
-#[repr(C, packed)]
-struct WindowIndex {
-    file_path_hash: u64,       // 8 bytes - xxHash3 of file path
-    window_start_token: u32,   // 4 bytes - token start position
-    window_end_token: u32,     // 4 bytes - token end position
-    window_start_char: u32,    // 4 bytes - character offset in file
-    window_end_char: u32,      // 4 bytes - character offset in file
-}
-```
-
-**Why both token and char positions:**
-
-| Use Case | Position Type | Benefit |
-|----------|---------------|---------|
-| Token consistency | `*_token` | Verify window is exactly 512 tokens |
-| User display | `*_char` | Direct text slice: `text[start..end]` |
-| Cross-model compat | `*_char` | Works even if tokenization differs |
-
-**Storage cost:** 24 bytes per window vs 16 bytes. For 1000 windows = 24KB overhead - negligible.
-
-**File path hash vs task ID hash:**
-- Using file path hash is more general
-- Works for tasks, memories, notes, any markdown collection
-- Same storage format can serve multiple use cases
-- Hash → path mapping stored in `cache.json` for reverse lookup
-
-### Search Algorithm
-
-1. Compute query embedding using model2vec
-2. Calculate cosine similarity against all window embeddings
-3. Return top-k windows, grouped/deduped by task_id
-4. Optionally show context: "matched in tokens 256-768 of auth-setup.md"
-
-### Model Options
-
-Default: `minishlab/potion-base-8M` (7.5M params, 256 dims, fast)
-
-Alternatives via config:
-- `potion-base-4M` - smaller, faster
-- `potion-base-32M` - higher quality
-- `potion-multilingual-128M` - non-English tasks
-
 ## Dependencies (Rust Crates)
 
-### Core Dependencies (Phase 1-2)
+### Core Dependencies
 
 | Crate | Purpose | Notes |
 |-------|---------|-------|
@@ -445,15 +318,6 @@ Alternatives via config:
 | `anyhow` | Error handling | Ergonomic error types |
 | `dirs` | Platform directories | For future global config |
 | `tracing` | Logging/tracing | Structured logging |
-
-### Semantic Search Dependencies (Phase 3)
-
-| Crate | Purpose |
-|-------|---------|
-| `model2vec-rs` | Static embedding model inference |
-| `safetensors` | Safetensor file format |
-| `ndarray` | Matrix operations for similarity |
-| `twox-hash` | Fast xxHash3 for task ID hashing |
 
 ### Optional/Future
 
@@ -535,18 +399,12 @@ taskgraph/
 │   ├── task.rs             # Task struct & parsing
 │   ├── graph.rs            # Graph building & operations
 │   ├── cache.rs            # Cache management
-│   ├── search.rs           # Semantic search (feature-gated)
-│   ├── embedding.rs        # Embedding storage/encoding (feature-gated)
 │   ├── commands/
 │   │   ├── mod.rs
 │   │   ├── list.rs
 │   │   ├── show.rs
-│   │   ├── create.rs
-│   │   ├── edit.rs
-│   │   ├── delete.rs
 │   │   ├── deps.rs
 │   │   ├── topo.rs
-│   │   ├── search.rs       # Feature-gated
 │   │   └── ...
 │   └── output.rs           # Output formatting
 └── tests/

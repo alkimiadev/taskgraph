@@ -29,7 +29,7 @@ Based on the SDD framework use case and "assumption points" analysis:
 - [ ] Expose as MCP tools for LLM integration
 - [ ] `taskgraph mcp` subcommand
 - [ ] Stdio transport (same as other MCP servers)
-- [ ] Tools: list, show, topo, cycles, parallel, critical, search
+- [ ] Tools: list, show, topo, cycles, parallel, critical
 
 ### 5.3 Documentation
 - [ ] README with installation, quick start, examples

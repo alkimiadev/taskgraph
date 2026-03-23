@@ -8,33 +8,32 @@ Address technical debt, improve test coverage, and ensure production readiness b
 
 ### 4.1 Test Coverage
 
-**Current: 20.89% | Target: 80%**
+**Current: 68.40% | Target: 80%**
 
-- [ ] Add integration tests using `assert_cmd`
-  - [ ] `validate` command
-  - [ ] `list` command with filters
-  - [ ] `topo` command
-  - [ ] `show` command
-  - [ ] Error cases (missing task, invalid path)
+- [x] Add integration tests using `assert_cmd`
+  - [x] `validate` command
+  - [x] `list` command with filters
+  - [x] `topo` command
+  - [x] `show` command
+  - [x] Error cases (missing task, invalid path)
 
-- [ ] Add unit tests for `graph.rs`
-  - [ ] Topological sort
-  - [ ] Cycle detection
-  - [ ] Parallel groups
-  - [ ] Critical path
-  - [ ] Betweenness centrality
+- [x] Add unit tests for `graph.rs`
+  - [x] Topological sort
+  - [x] Cycle detection
+  - [x] Parallel groups
+  - [x] Critical path
+  - [x] Betweenness centrality
 
-- [ ] Add unit tests for `cache.rs`
-  - [ ] Has changed detection
-  - [ ] Mtime tracking
+- [x] Add unit tests for `cache.rs`
+  - [x] Has changed detection
+  - [x] Mtime tracking
 
-- [ ] Add roundtrip test for embedding index
-  - [ ] Create index → save → load → verify
+- [ ] Add more integration tests for edge cases
+- [ ] Improve task.rs coverage (more Task parsing tests)
 
 ### 4.2 Code Review
 
 - [ ] Review `commands/*.rs` for error handling consistency
-- [ ] Review `embedding.rs` for edge cases
 - [ ] Review `graph.rs` for algorithm correctness
 - [ ] Review all public API documentation
 
@@ -48,14 +47,14 @@ Per `docs/issues/incomplete-workflow-commands.md`:
 
 ### 4.4 Documentation Review
 
-- [ ] Verify README accuracy
-- [ ] Check ARCHITECTURE.md reflects current state
+- [x] Verify README accuracy
+- [x] Check ARCHITECTURE.md reflects current state
 - [ ] Update phase docs with completion status
 - [ ] Add inline code documentation where missing
 
 ### 4.5 Code Quality
 
-- [ ] Run `cargo clippy --all-features -- -D warnings`
+- [ ] Run `cargo clippy -- -D warnings`
 - [ ] Run `cargo fmt --check`
 - [ ] Remove dead code (if any)
 - [ ] Consolidate duplicate code patterns
@@ -63,8 +62,6 @@ Per `docs/issues/incomplete-workflow-commands.md`:
 ### 4.6 Performance Baseline
 
 - [ ] Benchmark task discovery (100, 1000 tasks)
-- [ ] Benchmark embedding generation
-- [ ] Benchmark search query time
 - [ ] Document performance characteristics
 
 ## Success Criteria
@@ -74,3 +71,8 @@ Per `docs/issues/incomplete-workflow-commands.md`:
 - [ ] All documented issues reviewed
 - [ ] Performance baselines documented
 - [ ] Ready for Phase 5 (Polish & Extensions)
+
+## Notes
+
+- Semantic search has been extracted to [taskgraph-semantic](../taskgraph-semantic/)
+- Test coverage improved from 20.89% to 68.40% during initial Phase 4 work
