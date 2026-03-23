@@ -16,3 +16,6 @@ opencode.json
 
 # TaskGraph cache (optional - can be committed if desired)
 .taskgraph/
+
+# Git worktrees (managed by open-trees plugin)
+.worktrees/
