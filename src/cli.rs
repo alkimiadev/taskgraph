@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 
 use crate::discovery::TaskCollection;
+use crate::graph::DependencyGraph;
 
 /// CLI tool for managing task dependencies using markdown files.
 #[derive(Parser, Debug)]
@@ -150,25 +151,46 @@ impl Cli {
                 crate::commands::deps::execute(&collection, id)?;
             }
             Commands::Dependents { id } => {
-                println!("Dependents of: {}", id);
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                let graph = DependencyGraph::from_collection(&collection);
+                let dependents = graph.dependents(id);
+
+                if dependents.is_empty() {
+                    println!("No tasks depend on '{}'.", id);
+                } else {
+                    println!("Tasks that depend on '{}':", id);
+                    for dep_id in dependents {
+                        let status = collection
+                            .get(&dep_id)
+                            .map(|t| t.status().to_string())
+                            .unwrap_or_default();
+                        println!("  - {} ({})", dep_id, status);
+                    }
+                }
             }
             Commands::Topo { status } => {
-                println!("Topological order (status={:?})", status);
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::topo::execute(&collection, status.as_deref())?;
             }
             Commands::Cycles => {
-                println!("Check for cycles");
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::cycles::execute(&collection)?;
             }
             Commands::Parallel => {
-                println!("Parallel work groups");
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::parallel::execute(&collection)?;
             }
             Commands::Critical => {
-                println!("Critical path");
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::critical::execute(&collection)?;
             }
             Commands::Bottleneck => {
-                println!("Bottleneck tasks");
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::bottleneck::execute(&collection)?;
             }
             Commands::Graph { output } => {
-                println!("Graph (output={:?})", output);
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::graph_cmd::execute(&collection, output.as_deref())?;
             }
             Commands::Cache { command } => match command {
                 CacheCommands::Clear => println!("Cache cleared"),
