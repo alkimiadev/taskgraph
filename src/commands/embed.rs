@@ -31,9 +31,10 @@ pub fn execute(tasks_path: &Path, status: bool, model_id: Option<&str>) -> crate
         return Ok(());
     }
 
-    println!("Found {} tasks. Building embeddings...", collection.len());
+    println!("Found {} tasks. Tokenizing...", collection.len());
 
-    let mut all_embeddings: Vec<Vec<f32>> = Vec::new();
+    let tokenizer = model.tokenizer();
+    let mut window_texts: Vec<String> = Vec::new();
     let mut all_indices: Vec<WindowIndex> = Vec::new();
     let mut path_map: std::collections::HashMap<u64, String> = std::collections::HashMap::new();
     let mut file_count = 0;
@@ -52,7 +53,6 @@ pub fn execute(tasks_path: &Path, status: bool, model_id: Option<&str>) -> crate
         let file_path_hash = WindowIndex::hash_path(source);
         path_map.insert(file_path_hash, source.clone());
 
-        let tokenizer = model.tokenizer();
         let encoding = tokenizer
             .encode(body.as_str(), false)
             .map_err(|e| crate::Error::Graph(format!("Tokenization failed: {}", e)))?;
@@ -70,9 +70,7 @@ pub fn execute(tasks_path: &Path, status: bool, model_id: Option<&str>) -> crate
         for (window_tokens, start_token, end_token, start_char, end_char) in windows {
             let window_text: String = tokenizer.decode(&window_tokens, false).unwrap_or_default();
 
-            let embedding = model.encode_single(&window_text);
-
-            all_embeddings.push(embedding);
+            window_texts.push(window_text);
             all_indices.push(WindowIndex::new(
                 file_path_hash,
                 start_token as u32,
@@ -83,20 +81,25 @@ pub fn execute(tasks_path: &Path, status: bool, model_id: Option<&str>) -> crate
         }
     }
 
-    if all_embeddings.is_empty() {
+    if window_texts.is_empty() {
         println!("No content to embed.");
         return Ok(());
     }
 
-    let embedding_dim = all_embeddings
+    let n_windows = window_texts.len();
+    println!("Encoding {} windows in batch...", n_windows);
+
+    let result = model.encode_with_stats(&window_texts, Some(DEFAULT_WINDOW_SIZE), 1024);
+
+    let embedding_dim = result
+        .embeddings
         .first()
         .map(|e| e.len())
         .unwrap_or(DEFAULT_EMBEDDING_DIM);
-    let n_windows = all_embeddings.len();
 
     let embeddings_array = ndarray::Array2::from_shape_vec(
         (n_windows, embedding_dim),
-        all_embeddings.into_iter().flatten().collect(),
+        result.embeddings.into_iter().flatten().collect(),
     )
     .map_err(|e| crate::Error::Graph(format!("Failed to create embeddings array: {}", e)))?;
 
