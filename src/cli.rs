@@ -1,6 +1,10 @@
 //! CLI argument definitions using clap.
 
+use std::path::PathBuf;
+
 use clap::{Parser, Subcommand};
+
+use crate::discovery::TaskCollection;
 
 /// CLI tool for managing task dependencies using markdown files.
 #[derive(Parser, Debug)]
@@ -105,6 +109,14 @@ pub enum CacheCommands {
 }
 
 impl Cli {
+    /// Get the tasks directory path.
+    pub fn tasks_path(&self) -> PathBuf {
+        self.path
+            .as_ref()
+            .map(PathBuf::from)
+            .unwrap_or_else(|| PathBuf::from("./tasks"))
+    }
+
     /// Execute the CLI command.
     pub fn execute(&self) -> anyhow::Result<()> {
         match &self.command {
@@ -114,22 +126,28 @@ impl Cli {
                 scope,
                 risk,
             } => {
-                println!(
-                    "Init task {} name={:?} scope={:?} risk={:?}",
-                    id, name, scope, risk
-                );
+                crate::commands::init::execute(
+                    id,
+                    name.as_deref(),
+                    scope.as_deref(),
+                    risk.as_deref(),
+                )?;
             }
             Commands::Validate => {
-                println!("Validate tasks");
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::validate::execute(&collection)?;
             }
             Commands::List { status, tag } => {
-                println!("List tasks (status={:?}, tag={:?})", status, tag);
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::list::execute(&collection, status.as_deref(), tag.as_deref())?;
             }
             Commands::Show { id } => {
-                println!("Show task: {}", id);
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::show::execute(&collection, id)?;
             }
             Commands::Deps { id } => {
-                println!("Dependencies of: {}", id);
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::deps::execute(&collection, id)?;
             }
             Commands::Dependents { id } => {
                 println!("Dependents of: {}", id);

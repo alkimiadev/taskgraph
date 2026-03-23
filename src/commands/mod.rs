@@ -1,14 +1,14 @@
 //! Command implementations.
 
-pub mod init;
-pub mod validate;
-pub mod list;
-pub mod show;
-pub mod deps;
-pub mod topo;
-pub mod cycles;
-pub mod parallel;
-pub mod critical;
 pub mod bottleneck;
-pub mod graph_cmd;
 pub mod cache_cmd;
+pub mod critical;
+pub mod cycles;
+pub mod deps;
+pub mod graph_cmd;
+pub mod init;
+pub mod list;
+pub mod parallel;
+pub mod show;
+pub mod topo;
+pub mod validate;
