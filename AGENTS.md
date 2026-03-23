@@ -156,16 +156,31 @@ cargo fmt --check
 | `chrono` | Date/time handling |
 | `anyhow` | Error handling |
 | `dirs` | Platform directories |
+| `walkdir` | Directory scanning |
 | `tracing` | Logging |
 
 ### Semantic Search (Phase 3, feature-gated)
 
 | Crate | Purpose |
 |-------|---------|
-| `model2vec-rs` | Static embedding model inference |
+| `model2vec-rs` | Static embedding model inference (git: alkimiadev fork) |
 | `safetensors` | Safetensor file format |
 | `ndarray` | Matrix operations |
-| `twox-hash` | Fast xxHash3 for task ID hashing |
+| `twox-hash` | Fast xxHash3 for file path hashing |
+
+### Dependency Source Reference
+
+All dependency sources are available locally after `cargo build`:
+
+```
+~/.cargo/registry/src/     # crates.io dependencies
+~/.cargo/git/checkouts/    # git dependencies
+```
+
+When implementing, you can reference the source code for any dependency. For example:
+- `~/.cargo/registry/src/*/petgraph-*/` - graph algorithms
+- `~/.cargo/registry/src/*/gray_matter-*/` - frontmatter parsing
+- `~/.cargo/git/checkouts/model2vec-rs-*/` - embedding model (our fork with `encode_with_stats`)
 
 ## Relevant Files
 

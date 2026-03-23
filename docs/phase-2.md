@@ -108,6 +108,22 @@ Build and analyze dependency graphs. Implement cache for performance.
 | `serde_json` | Cache serialization |
 | `walkdir` | Directory scanning |
 
+### Reference Sources (after cargo build)
+
+```
+~/.cargo/registry/src/*/petgraph-*/      - graph algorithms (toposort, cycles, betweenness)
+~/.cargo/registry/src/*/serde_json-*/    - JSON serialization patterns
+```
+
+### Key petgraph algorithms to use
+
+```rust
+petgraph::algo::toposort(&graph, None)           // topological sort
+petgraph::algo::is_cyclic_directed(&graph)       // cycle detection
+petgraph::algo::dijkstra(...)                     // shortest paths
+petgraph::dot::Dot::new(&graph)                   // DOT format output
+```
+
 ## Tests Required
 
 - Build graph from tasks

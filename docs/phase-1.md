@@ -88,6 +88,15 @@ These are file operations. The CLI doesn't add value here.
 | `clap` | CLI parsing |
 | `chrono` | Timestamps |
 | `anyhow` | Error handling |
+| `walkdir` | Directory scanning |
+
+### Reference Sources (after cargo build)
+
+```
+~/.cargo/registry/src/*/gray_matter-*/   - frontmatter parsing implementation
+~/.cargo/registry/src/*/serde_yaml-*/    - YAML parsing details
+~/.cargo/registry/src/*/walkdir-*/       - directory traversal patterns
+```
 | `walkdir` | Recursive directory scanning |
 
 ## Tests Required

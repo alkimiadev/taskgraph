@@ -88,6 +88,13 @@ Based on the SDD framework use case and "assumption points" analysis:
 | `toml` | Config parsing |
 | `ratatui` | TUI (optional) |
 
+### Reference Sources (after cargo build)
+
+```
+~/.cargo/registry/src/*/notify-*/      - file system watching patterns
+~/.cargo/registry/src/*/toml-*/        - TOML parsing
+~/.cargo/registry/src/*/ratatui-*/     - TUI building (if implementing)
+
 ## Success Criteria
 
 - Stable 1.0 release

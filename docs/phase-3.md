@@ -96,10 +96,34 @@ Add embedding-based semantic search across task descriptions. Feature-gated.
 
 | Crate | Purpose |
 |-------|---------|
-| `model2vec-rs` | Embedding generation |
+| `model2vec-rs` | Embedding generation (git: alkimiadev fork) |
 | `safetensors` | Storage format |
 | `ndarray` | Matrix operations (cosine similarity) |
-| `twox-hash` | xxHash3 for task ID hashing |
+| `twox-hash` | xxHash3 for file path hashing |
+
+### Reference Sources (after cargo build)
+
+```
+~/.cargo/git/checkouts/model2vec-rs-*/           - our fork with encode_with_stats
+~/.cargo/registry/src/*/safetensors-*/           - safetensor read/write
+~/.cargo/registry/src/*/ndarray-*/               - matrix operations
+```
+
+### Key model2vec-rs API (our fork)
+
+```rust
+use model2vec_rs::model::{StaticModel, EncodeResult};
+
+let model = StaticModel::from_pretrained("minishlab/potion-base-8M", None, None, None)?;
+
+// Single-pass: embeddings + token counts
+let result: EncodeResult = model.encode_with_stats(&sentences, Some(512), 1024);
+// result.embeddings: Vec<Vec<f32>>
+// result.token_counts: Vec<usize>
+
+// Access tokenizer for rolling window logic
+let tokenizer = model.tokenizer();
+```
 
 ## Tests Required
 
