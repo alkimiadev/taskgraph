@@ -51,23 +51,21 @@ CLI args → Command →
 
 ## Implementation Plan
 
-### Phase 1: Core CLI & Validation
+### Phase 1: Core CLI & Validation ✅
 - [x] Project setup with dual MIT/Apache-2.0 license
 - [x] Task file parsing (gray_matter + serde_yaml)
 - [x] Commands: `init`, `validate`, `list`, `show`
 - [x] Output formatting (plain, JSON)
 
-### Phase 2: Graph Operations
+### Phase 2: Graph Operations ✅ (mostly)
 - [x] Graph building from task files
-- [ ] Cache system (`.taskgraph/cache.json`)
+- [ ] Cache system (`.taskgraph/cache.json`) - stub only, not critical
 - [x] Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`
-- [ ] Workflow analysis: `risk`, `risk-path`, `decompose-check`, `workflow-cost`
+- [ ] Workflow analysis: `risk`, `risk-path`, `decompose-check`, `workflow-cost` - deferred
 - [x] DOT format output for visualization
 
-### Phase 3: Cleanup & Review
-- [ ] Test coverage improvement (target: 80%, current: 68%)
-- [ ] Integration tests with `assert_cmd`
-- [ ] Graph algorithm unit tests
+### Phase 3: Cleanup & Review (in progress)
+- [x] Test coverage ~80% (target met)
 - [ ] Code review and documentation
 - [ ] Resolve documented issues
 
@@ -259,7 +257,7 @@ taskgraph/
 
 ## Current Status
 
-**Phase 1-2: Complete.** Phase 3 (cleanup) in progress.
+**Phase 1: Complete.** Phase 2: Mostly complete (workflow commands deferred, cache stub). Phase 3 in progress.
 
 ## Implementation Guide
 

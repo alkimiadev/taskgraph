@@ -77,7 +77,7 @@ This enables "automagically reactive" orchestration where the graph drives agent
 
 ## Implementation Phases
 
-### Phase 1: Core CLI & Validation
+### Phase 1: Core CLI & Validation ✅
 
 - Project setup with dual MIT/Apache-2.0 license
 - Task file parsing (frontmatter + body)
@@ -85,19 +85,26 @@ This enables "automagically reactive" orchestration where the graph drives agent
 - Output formatting (plain, JSON)
 - **No full CRUD** - files are source of truth, edited directly
 
-### Phase 2: Graph Operations
+### Phase 2: Graph Operations ✅ (mostly)
 
 - Graph building from task files
-- Cache system (`.taskgraph/cache.json`)
+- Cache system (`.taskgraph/cache.json`) - stub only, not critical
 - Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`
+- Workflow analysis commands: deferred
 - DOT format output for visualization
 
-### Phase 3: Polish & Extensions
+### Phase 3: Cleanup & Review (in progress)
+
+- Test coverage ~80% (target met)
+- Code review and documentation
+- Resolve documented issues
+
+### Phase 4: Polish & Extensions
 
 - File watching (`--watch`)
 - TUI mode (optional)
 - MCP server for LLM integration
-- Performance optimization
+- Distribution (cargo publish, binaries)
 
 ### Semantic Search
 

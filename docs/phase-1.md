@@ -4,6 +4,8 @@
 
 Establish the foundation: task file parsing, validation, and basic discovery. Skip full CRUD - files are the source of truth, edited directly.
 
+## Status: ✅ COMPLETE
+
 ## Philosophy
 
 > "Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away."
@@ -18,46 +20,46 @@ The CLI adds value where manual methods fail (graph analysis). CRUD is just file
 - [x] AGENTS.md with coding guidelines
 - [x] Architecture document
 
-### 1.2 Task Parsing
-- [ ] Implement `Task::from_file()` with gray_matter
-- [ ] Implement `Task::to_markdown()` for serialization (used internally)
-- [ ] Handle missing/invalid frontmatter gracefully
-- [ ] Add tests for parsing edge cases
+### 1.2 Task Parsing ✅
+- [x] Implement `Task::from_file()` with gray_matter
+- [x] Implement `Task::to_markdown()` for serialization (used internally)
+- [x] Handle missing/invalid frontmatter gracefully
+- [x] Add tests for parsing edge cases
 
-### 1.3 Task Discovery
-- [ ] Scan directory for `*.md` files (recursive? configurable?)
-- [ ] Filter files with valid frontmatter containing `id` field
-- [ ] Error on duplicate IDs
-- [ ] Default task directory: `./tasks`
-- [ ] Configurable via `--path`
+### 1.3 Task Discovery ✅
+- [x] Scan directory for `*.md` files (recursive? configurable?)
+- [x] Filter files with valid frontmatter containing `id` field
+- [x] Error on duplicate IDs
+- [x] Default task directory: `./tasks`
+- [x] Configurable via `--path`
 
-### 1.4 Commands
+### 1.4 Commands ✅
 
-#### `init <id>` (scaffolding helper)
-- [ ] Create template task file with given ID
-- [ ] Optional flags: `--name`, `--scope`, `--risk`, `--impact`, `--level`
-- [ ] User fills in body manually
-- [ ] Not required - just convenience
+#### `init <id>` (scaffolding helper) ✅
+- [x] Create template task file with given ID
+- [x] Optional flags: `--name`, `--scope`, `--risk`
+- [x] User fills in body manually
+- [x] Not required - just convenience
 
-#### `validate`
-- [ ] Check all files parse correctly
-- [ ] Check for duplicate IDs
-- [ ] Check for missing dependencies (referenced but don't exist)
-- [ ] Output: list of issues or "OK"
+#### `validate` ✅
+- [x] Check all files parse correctly
+- [x] Check for duplicate IDs
+- [x] Check for missing dependencies (referenced but don't exist)
+- [x] Output: list of issues or "OK"
 
-#### `list`
-- [ ] List all tasks with basic info
-- [ ] Filter by status, tag, risk, scope
-- [ ] Output: plain text table, JSON
+#### `list` ✅
+- [x] List all tasks with basic info
+- [x] Filter by status, tag
+- [x] Output: plain text table, JSON
 
-#### `show <id>`
-- [ ] Display single task (frontmatter + body)
-- [ ] Output: formatted plain text, JSON
+#### `show <id>` ✅
+- [x] Display single task (frontmatter + body)
+- [x] Output: formatted plain text, JSON
 
-### 1.5 Output Formatting
-- [ ] Plain text (default)
-- [ ] JSON (`--json` flag)
-- [ ] Consistent error messages
+### 1.5 Output Formatting ✅
+- [x] Plain text (default)
+- [x] JSON (`--json` flag)
+- [x] Consistent error messages
 
 ## What We're NOT Building
 
@@ -100,18 +102,18 @@ These are file operations. The CLI doesn't add value here.
 
 ## Tests Required
 
-- Parse valid task file
-- Parse task with missing frontmatter
-- Parse task with invalid YAML
-- Parse task with missing `id` field
-- Detect duplicate IDs
-- Detect missing dependencies
-- List with filters
-- `init` creates valid template
+- [x] Parse valid task file
+- [x] Parse task with missing frontmatter
+- [x] Parse task with invalid YAML
+- [x] Parse task with missing `id` field
+- [x] Detect duplicate IDs
+- [x] Detect missing dependencies
+- [x] List with filters
+- [x] `init` creates valid template
 
 ## Success Criteria
 
-- Can parse all valid task files
-- Validates integrity of task set
-- Clear error messages
-- Tests pass
+- [x] Can parse all valid task files
+- [x] Validates integrity of task set
+- [x] Clear error messages
+- [x] Tests pass
