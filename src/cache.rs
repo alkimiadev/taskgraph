@@ -38,7 +38,7 @@ impl Cache {
     pub fn has_changed(&self, file: &str, mtime: u64) -> bool {
         self.mtimes
             .get(file)
-            .map_or(true, |&cached| cached != mtime)
+            .is_none_or(|&cached| cached != mtime)
     }
 
     /// Update the mtime for a file.

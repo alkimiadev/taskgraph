@@ -14,7 +14,7 @@ pub fn execute(collection: &TaskCollection) -> crate::Result<()> {
 
     println!("Bottleneck tasks (ranked by path centrality):");
     println!();
-    println!("{:<20} {:>10} {}", "ID", "SCORE", "NAME");
+    println!("{:<20} {:>10} NAME", "ID", "SCORE");
     println!("{}", "-".repeat(60));
 
     for (task_id, score) in bottlenecks.iter().take(10) {

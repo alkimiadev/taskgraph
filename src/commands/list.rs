@@ -37,7 +37,7 @@ pub fn execute(
         return Ok(());
     }
 
-    println!("{:<20} {:<12} {:<10} {}", "ID", "STATUS", "SCOPE", "NAME");
+    println!("{:<20} {:<12} {:<10} NAME", "ID", "STATUS", "SCOPE");
     println!("{}", "-".repeat(70));
 
     for task in tasks {

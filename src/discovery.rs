@@ -54,7 +54,7 @@ impl TaskCollection {
             let file_path = entry.path();
 
             // Only process .md files
-            if file_path.extension().map_or(false, |ext| ext == "md") {
+            if file_path.extension().is_some_and(|ext| ext == "md") {
                 match Task::from_file(file_path) {
                     Ok(task) => {
                         let id = task.id().to_string();

@@ -7,8 +7,10 @@ use std::path::Path;
 /// Task status.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
+#[derive(Default)]
 pub enum TaskStatus {
     /// Task is pending.
+    #[default]
     Pending,
     /// Task is in progress.
     InProgress,
@@ -86,11 +88,6 @@ pub enum TaskLevel {
     Research,
 }
 
-impl Default for TaskStatus {
-    fn default() -> Self {
-        Self::Pending
-    }
-}
 
 impl std::fmt::Display for TaskStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

@@ -33,8 +33,8 @@ pub fn execute(
         modified: Some(Utc::now()),
         assignee: None,
         due: None,
-        scope: scope.and_then(|s| parse_scope(s)),
-        risk: risk.and_then(|r| parse_risk(r)),
+        scope: scope.and_then(parse_scope),
+        risk: risk.and_then(parse_risk),
         impact: None,
         level: None,
     };
