@@ -37,10 +37,11 @@ Add embedding-based semantic search across task descriptions. Feature-gated.
 
 #### Index Struct Layout (16 bytes)
 ```
-[task_hash: u64][window_start: u32][window_end: u32]
+[file_path_hash: u64][window_start: u32][window_end: u32]
 ```
-- [ ] Hash task IDs with xxHash3
-- [ ] Store hash → id mapping in cache.json
+- [ ] Hash **file path** with xxHash3 (not task_id - more general)
+- [ ] Enables reuse for memories, notes, any markdown collection
+- [ ] Store hash → path mapping in cache.json
 - [ ] Pack/unpack struct tensor
 
 ### 3.4 Commands
@@ -58,6 +59,7 @@ Add embedding-based semantic search across task descriptions. Feature-gated.
 - [ ] `taskgraph embed --status` - show info (count, model, size, last build)
 - [ ] Detect stale embeddings (mtimes changed)
 - [ ] Full rebuild (no incremental for v1)
+- [ ] Store file_path_hash → path mapping in cache.json
 
 ### 3.5 CLI Integration
 - [ ] Search subcommand under main CLI

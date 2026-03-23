@@ -377,13 +377,17 @@ Header JSON:
 ```rust
 #[repr(C, packed)]
 struct WindowIndex {
-    task_hash: u64,      // 8 bytes - xxHash3 of task_id
-    window_start: u32,   // 4 bytes - token start position
-    window_end: u32,     // 4 bytes - token end position
+    file_path_hash: u64,  // 8 bytes - xxHash3 of file path
+    window_start: u32,    // 4 bytes - token start position
+    window_end: u32,      // 4 bytes - token end position
 }
 ```
 
-**Task ID → Hash mapping** stored in `cache.json` for reverse lookup.
+**File path hash vs task ID hash:**
+- Using file path hash is more general
+- Works for tasks, memories, notes, any markdown collection
+- Same storage format can serve multiple use cases
+- Hash → path mapping stored in `cache.json` for reverse lookup
 
 ### Search Algorithm
 
