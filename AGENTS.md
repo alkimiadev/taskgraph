@@ -227,9 +227,29 @@ taskgraph/
 
 ## Current Status
 
-**Phase 0: Setup**
+**Phase 0: Setup - Complete**
 
-Architecture document complete. Ready to initialize project.
+Ready to begin implementation.
+
+## Implementation Guide
+
+See `docs/implementation.md` for:
+- Available tools (bash, webSearch, task, worktree)
+- Sub-agent spawning for research
+- Available models
+- Document organization
+- External repository access
+
+## Parallel Development
+
+Phase 3 (semantic search) can be developed in parallel with Phase 1-2 using git worktrees:
+
+```bash
+worktree_mode { "action": "on" }
+worktree_make { "action": "create", "name": "phase-3-semantic" }
+```
+
+See `/workspace/open-trees/README.md` for worktree usage.
 
 ## License
 
