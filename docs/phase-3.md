@@ -27,6 +27,21 @@ Add embedding-based semantic search across task descriptions. Feature-gated.
 - [ ] Generate embedding per window (256 dims for potion-base-8M)
 - [ ] Track window positions (start token, end token)
 
+**Important: Token-based windows, not line-based**
+
+Window boundaries are in TOKEN positions, not lines or characters:
+```
+Text: "Hello world\nThis is a test\nMore text here"
+Tokens: [1234, 5678, 9012, 3456, 7890, 2345, 6789, ...]
+         ^token 0      ^token 3        ^token 6
+
+Window 0: tokens[0:512]   → embedding_0
+Window 1: tokens[256:768] → embedding_1  (50% overlap)
+```
+
+For user display ("matched in lines 10-15"), would need token→line mapping.
+For v1, just report token positions. Line mapping is a future enhancement.
+
 ### 3.3 Safetensor Storage
 
 #### Storage Format
@@ -108,6 +123,21 @@ Add embedding-based semantic search across task descriptions. Feature-gated.
 ~/.cargo/registry/src/*/safetensors-*/           - safetensor read/write
 ~/.cargo/registry/src/*/ndarray-*/               - matrix operations
 ```
+
+### Reference Implementation (Python)
+
+See `/workspace/@alkimiadev/research/rolling_windows/encoder.py` for a working rolling window implementation. Key function:
+
+```python
+def _create_rolling_token_chunks_from_ids(
+    token_ids: List[int],      # Token IDs, NOT text
+    max_chunk_len: int,        # 512
+    overlap_percentage: float  # 0.5
+) -> List[List[int]]:
+    # Window on token IDs, then decode each chunk
+```
+
+This shows the pattern: tokenize → window on token IDs → decode chunks → embed.
 
 ### Key model2vec-rs API (our fork)
 
