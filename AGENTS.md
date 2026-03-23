@@ -52,16 +52,17 @@ CLI args → Command →
 
 ## Implementation Plan
 
-### Phase 1: Core CLI & CRUD
+### Phase 1: Core CLI & Validation
 - [ ] Project setup with dual MIT/Apache-2.0 license
 - [ ] Task file parsing (gray_matter + serde_yaml)
-- [ ] Basic commands: `list`, `show`, `create`, `edit`, `delete`
+- [ ] Commands: `init`, `validate`, `list`, `show`
 - [ ] Output formatting (plain, JSON)
 
 ### Phase 2: Graph Operations
 - [ ] Graph building from task files
 - [ ] Cache system (`.taskgraph/cache.json`)
-- [ ] Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`
+- [ ] Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`
+- [ ] Workflow analysis: `risk`, `risk-path`, `decompose-check`, `workflow-cost`
 - [ ] DOT format output for visualization
 
 ### Phase 3: Semantic Search (Feature-gated)
@@ -117,7 +118,7 @@ cargo llvm-cov --all-features --html   # Generate HTML report
 1. **Happy Path** - Normal usage with valid inputs
 2. **Error Path** - Invalid inputs, missing files, malformed frontmatter
 3. **Graph Operations** - Cycles, missing dependencies, empty graphs
-4. **Roundtrip** - Create task → read task → values match
+4. **Roundtrip** - Parse task file → write → parse again → values match
 
 ### Documentation Standards
 

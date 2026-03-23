@@ -31,32 +31,34 @@ TaskGraph is designed for AI agent orchestration in software development. Instea
 TaskGraph supports the [Spec-Driven Development (SDD) framework](/workspace/@alkminer/reference/spec-driven-dev/README.md) where agents:
 
 1. **Task Decomposition Specialist**: Creates tasks from architecture
-   ```bash
-   taskgraph create auth-setup --name "Setup Authentication" --depends-on database-schema
-   taskgraph create oauth-impl --name "Implement OAuth" --depends-on auth-setup
-   ```
+    ```bash
+    # Create task files directly (or use init as scaffold)
+    taskgraph init auth-setup --name "Setup Authentication" --scope narrow --risk low
+    # Then edit file to add depends_on, body content
+    ```
 
 2. **Implementation Specialist**: Selects and executes tasks
-   ```bash
-   taskgraph topo --status pending           # Get next executable tasks
-   taskgraph edit $TASK_ID --status in-progress
-   # ... implement ...
-   taskgraph edit $TASK_ID --status completed
-   ```
+    ```bash
+    taskgraph topo --status pending           # Get next executable tasks
+    # Edit file directly: status: in-progress
+    # ... implement ...
+    # Edit file directly: status: completed
+    taskgraph validate                         # Verify no issues
+    ```
 
 3. **Safe Exit Mechanism**: Agents can unblock themselves
-   ```bash
-   taskgraph edit $TASK_ID --status blocked
-   taskgraph create resolve-env-issue --name "Resolve: Missing env vars"
-   taskgraph add-dependency resolve-env-issue $TASK_ID
-   ```
+    ```bash
+    # Edit file directly: status: blocked
+    taskgraph init resolve-env-issue --name "Resolve: Missing env vars"
+    # Edit new file to add: depends_on: [resolve-env-issue]
+    ```
 
 4. **Review Injection**: Based on graph analysis
-   ```bash
-   taskgraph communities   # Review after each community
-   taskgraph bottlenecks   # Review before critical path tasks
-   taskgraph parallel      # Review before parallel groups merge
-   ```
+    ```bash
+    taskgraph risk           # Review high-risk tasks
+    taskgraph bottleneck     # Review before critical tasks
+    taskgraph parallel       # Review before parallel groups merge
+    ```
 
 ### Future: Reactive Server Mode
 
@@ -75,18 +77,19 @@ This enables "automagically reactive" orchestration where the graph drives agent
 
 ## Implementation Phases
 
-### Phase 1: Core CLI & CRUD
+### Phase 1: Core CLI & Validation
 
 - Project setup with dual MIT/Apache-2.0 license
 - Task file parsing (frontmatter + body)
-- Basic CRUD commands: `list`, `show`, `create`, `edit`, `delete`
+- Commands: `init`, `validate`, `list`, `show`
 - Output formatting (plain, JSON)
+- **No full CRUD** - files are source of truth, edited directly
 
 ### Phase 2: Graph Operations
 
 - Graph building from task files
 - Cache system (`.taskgraph/cache.json`)
-- Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`
+- Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`
 - DOT format output for visualization
 
 ### Phase 3: Semantic Search (Feature-gated)
@@ -147,7 +150,7 @@ Detailed description of the task. This can be any markdown content.
 |-------|------|-------------|
 | `id` | string | Unique identifier (required) |
 | `name` | string | Human-readable name (required) |
-| `status` | enum | pending, in-progress, completed, failed |
+| `status` | enum | pending, in-progress, completed, failed, blocked |
 | `depends_on` | string[] | Tasks that must complete first |
 
 ### Optional Frontmatter Fields
@@ -200,17 +203,16 @@ LLMs are well-calibrated to categorical estimates, not numeric ones. Use these f
 
 ## CLI Commands
 
-### Task CRUD (No Graph Needed)
-
-These operations work on individual files:
+### Task Discovery & Validation
 
 ```
-taskgraph list [--path <dir>] [--status <status>] [--tag <tag>]
-taskgraph show <id> [--path <dir>]
-taskgraph create <id> --name <name> [--depends-on <id>...] [options]
-taskgraph edit <id> [--name <name>] [--status <status>] [options]
-taskgraph delete <id>
+taskgraph init <id> [--name <name>] [--scope <scope>] [--risk <risk>]  # Scaffold new task
+taskgraph validate                     # Check all tasks valid, no duplicates/missing deps
+taskgraph list [--status <status>] [--tag <tag>]  # List tasks
+taskgraph show <id>                    # Display task details
 ```
+
+**Note**: No full CRUD. Files are the source of truth. Edit files directly.
 
 ### Graph Operations (Cache Helps)
 
@@ -222,7 +224,8 @@ taskgraph dependents <id>        # What's waiting on this task?
 taskgraph topo                   # Topological sort (execution order)
 taskgraph cycles                 # Detect circular dependencies
 taskgraph parallel               # Groups of tasks that can run together
-taskgraph critical               # Critical path / bottleneck tasks
+taskgraph critical               # Longest path (completion blockers)
+taskgraph bottleneck             # High betweenness (on many paths)
 taskgraph graph                  # Visualize dependency graph (DOT format)
 ```
 
@@ -287,13 +290,11 @@ This direction gives correct topological order: A, B, C
   "built_at": "2026-03-23T10:00:00Z",
   "files": {
     "tasks/auth-setup.md": {
-      "mtime": 1711185600,
-      "hash": "abc123"
+      "mtime": 1711185600
     }
   },
-  "task_hashes": {
-    "auth-setup": 18446744073709551615,
-    "api-impl": 12345678901234567890
+  "file_path_hashes": {
+    "tasks/auth-setup.md": 18446744073709551615
   },
   "graph": {
     "nodes": [...],
@@ -302,10 +303,12 @@ This direction gives correct topological order: A, B, C
 }
 ```
 
+**Note**: Uses mtime only for invalidation (fast, good enough). `file_path_hashes` is for semantic search index lookups.
+
 ### Cache Validation
 
 1. On graph operation, check if `.taskgraph/cache.json` exists
-2. Compare file mtimes/hashes against cached values
+2. Compare file mtimes against cached values
 3. If any file changed (or new files exist), rebuild graph
 4. If all match, use cached graph
 

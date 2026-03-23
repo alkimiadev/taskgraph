@@ -17,6 +17,24 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
+    /// Initialize/scaffold a new task file
+    Init {
+        /// Task ID
+        id: String,
+        /// Task name
+        #[arg(short, long)]
+        name: Option<String>,
+        /// Task scope
+        #[arg(short, long)]
+        scope: Option<String>,
+        /// Task risk
+        #[arg(short, long)]
+        risk: Option<String>,
+    },
+
+    /// Validate all task files
+    Validate,
+
     /// List all tasks
     List {
         /// Filter by status
@@ -29,45 +47,6 @@ pub enum Commands {
 
     /// Show details of a specific task
     Show {
-        /// Task ID
-        id: String,
-    },
-
-    /// Create a new task
-    Create {
-        /// Task ID
-        id: String,
-        /// Task name
-        #[arg(short, long)]
-        name: String,
-        /// Tasks this depends on
-        #[arg(short, long)]
-        depends_on: Vec<String>,
-        /// Task status
-        #[arg(short, long, default_value = "pending")]
-        status: String,
-    },
-
-    /// Edit an existing task
-    Edit {
-        /// Task ID
-        id: String,
-        /// New name
-        #[arg(short, long)]
-        name: Option<String>,
-        /// New status
-        #[arg(short, long)]
-        status: Option<String>,
-        /// Add dependencies
-        #[arg(long)]
-        add_dep: Vec<String>,
-        /// Remove dependencies
-        #[arg(long)]
-        remove_dep: Vec<String>,
-    },
-
-    /// Delete a task
-    Delete {
         /// Task ID
         id: String,
     },
@@ -97,8 +76,11 @@ pub enum Commands {
     /// Show groups of tasks that can be done in parallel
     Parallel,
 
-    /// Show critical path / bottleneck tasks
+    /// Show critical path (longest path through graph)
     Critical,
+
+    /// Show bottleneck tasks (high betweenness centrality)
+    Bottleneck,
 
     /// Visualize the dependency graph (DOT format)
     Graph {
@@ -126,37 +108,25 @@ impl Cli {
     /// Execute the CLI command.
     pub fn execute(&self) -> anyhow::Result<()> {
         match &self.command {
+            Commands::Init {
+                id,
+                name,
+                scope,
+                risk,
+            } => {
+                println!(
+                    "Init task {} name={:?} scope={:?} risk={:?}",
+                    id, name, scope, risk
+                );
+            }
+            Commands::Validate => {
+                println!("Validate tasks");
+            }
             Commands::List { status, tag } => {
                 println!("List tasks (status={:?}, tag={:?})", status, tag);
             }
             Commands::Show { id } => {
                 println!("Show task: {}", id);
-            }
-            Commands::Create {
-                id,
-                name,
-                depends_on,
-                status,
-            } => {
-                println!(
-                    "Create task {} ({}) deps={:?} status={}",
-                    id, name, depends_on, status
-                );
-            }
-            Commands::Edit {
-                id,
-                name,
-                status,
-                add_dep,
-                remove_dep,
-            } => {
-                println!(
-                    "Edit task {} name={:?} status={:?} +{:?} -{:?}",
-                    id, name, status, add_dep, remove_dep
-                );
-            }
-            Commands::Delete { id } => {
-                println!("Delete task: {}", id);
             }
             Commands::Deps { id } => {
                 println!("Dependencies of: {}", id);
@@ -175,6 +145,9 @@ impl Cli {
             }
             Commands::Critical => {
                 println!("Critical path");
+            }
+            Commands::Bottleneck => {
+                println!("Bottleneck tasks");
             }
             Commands::Graph { output } => {
                 println!("Graph (output={:?})", output);
