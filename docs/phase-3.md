@@ -31,9 +31,24 @@ Add embedding-based semantic search across task descriptions. Feature-gated.
 
 #### Storage Format
 - [ ] Create `.taskgraph/embeddings.safetensors`
-- [ ] Tensor: `embeddings` [N, 256] F32
+- [ ] Tensor: `embeddings` [N, D] F32 where D = model embedding dim
 - [ ] Tensor: `index` [N, 16] U8 (struct tensor)
 - [ ] Memory-mapped access for fast reads
+
+#### Metadata (in safetensor `__metadata__` field)
+```json
+{
+  "model_id": "minishlab/potion-base-8M",
+  "embedding_dim": "256",
+  "window_size": "512",
+  "overlap": "0.5",
+  "created_at": "2026-03-23T12:00:00Z",
+  "file_count": "42"
+}
+```
+- [ ] Store model info for validation and status display
+- [ ] Detect model mismatch (rebuild needed?)
+- [ ] Enable `embed --status` to show model used
 
 #### Index Struct Layout (16 bytes)
 ```
@@ -100,7 +115,8 @@ Add embedding-based semantic search across task descriptions. Feature-gated.
 ## Success Criteria
 
 - `search` returns semantically relevant tasks
-- Embeddings stored in ~4KB per task (256 dims × 4 bytes)
+- Embeddings stored in ~D*4 bytes per window (D = model dim, e.g., 1024 bytes for 256 dims)
 - Search is fast (sub-second for hundreds of tasks)
 - Feature can be disabled without affecting core
 - Clear error messages when feature not enabled
+- Model-agnostic: works with any model2vec model

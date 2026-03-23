@@ -357,18 +357,28 @@ Store embeddings and index as pure tensors for memory-mapped access:
 
 Header JSON:
 {
+  "__metadata__": {
+    "model_id": "minishlab/potion-base-8M",
+    "embedding_dim": "256",
+    "window_size": "512",
+    "overlap": "0.5",
+    "created_at": "2026-03-23T12:00:00Z",
+    "file_count": "42"
+  },
   "embeddings": {
     "dtype": "F32",
-    "shape": [N, 256],
-    "data_offsets": [0, N*256*4]
+    "shape": [N, D],
+    "data_offsets": [0, N*D*4]
   },
   "index": {
     "dtype": "U8",
     "shape": [N, 16],
-    "data_offsets": [N*256*4, N*256*4 + N*16]
+    "data_offsets": [N*D*4, N*D*4 + N*16]
   }
 }
 ```
+
+**Note:** Embedding dimension D depends on model (256 for potion-base-8M, 384 for potion-base-32M, 768 for multilingual). Never hardcode - read from metadata or tensor shape.
 
 ### Index Struct Layout
 
