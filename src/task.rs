@@ -20,6 +20,72 @@ pub enum TaskStatus {
     Blocked,
 }
 
+/// Task scope - how many files/components affected.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum TaskScope {
+    /// Single file, one function.
+    Single,
+    /// 2-3 files, related changes.
+    #[default]
+    Narrow,
+    /// One component/module.
+    Moderate,
+    /// Cross-cutting, multiple modules.
+    Broad,
+    /// Architecture-level change.
+    System,
+}
+
+/// Task risk - likelihood of failure or iteration.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum TaskRisk {
+    /// Pattern match, no thinking required.
+    Trivial,
+    /// Clear path, minimal unknowns.
+    #[default]
+    Low,
+    /// Some decisions needed.
+    Medium,
+    /// Multiple unknowns, may iterate.
+    High,
+    /// Architectural implications.
+    Critical,
+}
+
+/// Task impact - consequence if task fails.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum TaskImpact {
+    /// Only affects this task.
+    #[default]
+    Isolated,
+    /// Blocks related tasks.
+    Component,
+    /// Blocks entire phase.
+    Phase,
+    /// Requires re-planning.
+    Project,
+}
+
+/// Task level - type of work.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum TaskLevel {
+    /// Architecture, design.
+    Planning,
+    /// Breaking down work.
+    Decomposition,
+    /// Writing code.
+    #[default]
+    Implementation,
+    /// Verification.
+    Review,
+    /// Information gathering.
+    Research,
+}
+
 impl Default for TaskStatus {
     fn default() -> Self {
         Self::Pending
@@ -34,6 +100,91 @@ impl std::fmt::Display for TaskStatus {
             Self::Completed => write!(f, "completed"),
             Self::Failed => write!(f, "failed"),
             Self::Blocked => write!(f, "blocked"),
+        }
+    }
+}
+
+impl TaskScope {
+    /// Get approximate token count for this scope.
+    pub fn token_estimate(&self) -> u32 {
+        match self {
+            Self::Single => 500,
+            Self::Narrow => 1500,
+            Self::Moderate => 3000,
+            Self::Broad => 6000,
+            Self::System => 10000,
+        }
+    }
+}
+
+impl TaskRisk {
+    /// Get implied success probability for this risk level.
+    pub fn success_probability(&self) -> f64 {
+        match self {
+            Self::Trivial => 0.98,
+            Self::Low => 0.90,
+            Self::Medium => 0.80,
+            Self::High => 0.65,
+            Self::Critical => 0.50,
+        }
+    }
+}
+
+impl TaskImpact {
+    /// Get criticality weight for cost-benefit analysis.
+    pub fn weight(&self) -> f64 {
+        match self {
+            Self::Isolated => 1.0,
+            Self::Component => 1.5,
+            Self::Phase => 2.0,
+            Self::Project => 3.0,
+        }
+    }
+}
+
+impl std::fmt::Display for TaskScope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Single => write!(f, "single"),
+            Self::Narrow => write!(f, "narrow"),
+            Self::Moderate => write!(f, "moderate"),
+            Self::Broad => write!(f, "broad"),
+            Self::System => write!(f, "system"),
+        }
+    }
+}
+
+impl std::fmt::Display for TaskRisk {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Trivial => write!(f, "trivial"),
+            Self::Low => write!(f, "low"),
+            Self::Medium => write!(f, "medium"),
+            Self::High => write!(f, "high"),
+            Self::Critical => write!(f, "critical"),
+        }
+    }
+}
+
+impl std::fmt::Display for TaskImpact {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Isolated => write!(f, "isolated"),
+            Self::Component => write!(f, "component"),
+            Self::Phase => write!(f, "phase"),
+            Self::Project => write!(f, "project"),
+        }
+    }
+}
+
+impl std::fmt::Display for TaskLevel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Planning => write!(f, "planning"),
+            Self::Decomposition => write!(f, "decomposition"),
+            Self::Implementation => write!(f, "implementation"),
+            Self::Review => write!(f, "review"),
+            Self::Research => write!(f, "research"),
         }
     }
 }
@@ -69,6 +220,18 @@ pub struct TaskFrontmatter {
     /// Due date.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub due: Option<String>,
+    /// Task scope - how many files/components affected.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope: Option<TaskScope>,
+    /// Task risk - likelihood of failure or iteration.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub risk: Option<TaskRisk>,
+    /// Task impact - consequence if task fails.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub impact: Option<TaskImpact>,
+    /// Task level - type of work.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub level: Option<TaskLevel>,
 }
 
 /// A task with its content.

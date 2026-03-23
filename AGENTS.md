@@ -28,6 +28,8 @@ topo order, cycles, communities, bottlenecks
 |---------|-----------|------|
 | Task definition | `Task` | `src/task.rs` |
 | Parsed frontmatter | `TaskFrontmatter` | `src/task.rs` |
+| Task status | `TaskStatus` | `src/task.rs` |
+| Task estimation | `TaskScope`, `TaskRisk`, `TaskImpact`, `TaskLevel` | `src/task.rs` |
 | Dependency graph | `DiGraph<TaskId, ()>` | `src/graph.rs` |
 | Cache + graph state | `Cache` | `src/cache.rs` |
 | CLI command | `Commands` enum | `src/cli.rs` |

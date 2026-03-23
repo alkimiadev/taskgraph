@@ -161,6 +161,43 @@ Detailed description of the task. This can be any markdown content.
 | `assignee` | string | Person or agent responsible |
 | `due` | date | Due date |
 
+### Task Estimation Fields (Categorical)
+
+LLMs are well-calibrated to categorical estimates, not numeric ones. Use these for workflow analysis:
+
+| Field | Type | Values | Description |
+|-------|------|--------|-------------|
+| `scope` | enum | single, narrow, moderate, broad, system | How many files/components affected |
+| `risk` | enum | trivial, low, medium, high, critical | Likelihood of failure or iteration |
+| `impact` | enum | isolated, component, phase, project | Consequence if task fails |
+| `level` | enum | planning, decomposition, implementation, review, research | Task type |
+
+**Scope → Token Estimates** (environment-dependent):
+| Scope | Approximate Tokens |
+|-------|-------------------|
+| `single` | ~500 |
+| `narrow` | ~1,500 |
+| `moderate` | ~3,000 |
+| `broad` | ~6,000 |
+| `system` | ~10,000+ |
+
+**Risk → Success Probability** (for cost-benefit analysis):
+| Risk | Implied p |
+|------|-----------|
+| `trivial` | 0.98 |
+| `low` | 0.90 |
+| `medium` | 0.80 |
+| `high` | 0.65 |
+| `critical` | 0.50 |
+
+**Impact → Criticality Weight**:
+| Impact | Weight |
+|--------|--------|
+| `isolated` | 1.0 |
+| `component` | 1.5 |
+| `phase` | 2.0 |
+| `project` | 3.0 |
+
 ## CLI Commands
 
 ### Task CRUD (No Graph Needed)
@@ -194,6 +231,15 @@ taskgraph graph                  # Visualize dependency graph (DOT format)
 ```
 taskgraph cache clear            # Clear the cache
 taskgraph cache status           # Show cache info (size, age, file count)
+```
+
+### Workflow Analysis
+
+```
+taskgraph risk                   # Show risk distribution across tasks
+taskgraph risk-path              # Highest risk path through graph
+taskgraph decompose-check        # Flag tasks that should be split (risk > medium)
+taskgraph workflow-cost          # Expected cost using cost-benefit framework
 ```
 
 ### Semantic Search (Phase 3)

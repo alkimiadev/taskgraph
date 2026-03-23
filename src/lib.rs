@@ -2,15 +2,15 @@
 //!
 //! See [`taskgraph::Task`] for the core task structure.
 
-pub mod cli;
-pub mod task;
-pub mod graph;
 pub mod cache;
+pub mod cli;
 pub mod commands;
-pub mod output;
 pub mod error;
+pub mod graph;
+pub mod output;
+pub mod task;
 
-pub use task::{Task, TaskFrontmatter, TaskStatus};
-pub use graph::DependencyGraph;
 pub use cache::Cache;
 pub use error::{Error, Result};
+pub use graph::DependencyGraph;
+pub use task::{Task, TaskFrontmatter, TaskImpact, TaskLevel, TaskRisk, TaskScope, TaskStatus};
