@@ -1,2 +1,18 @@
+# IDE / Editor
 .opencode
 opencode.json
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Rust
+/target/
+**/*.rs.bk
+
+# Coverage
+/coverage/
+*.lcov
+
+# TaskGraph cache (optional - can be committed if desired)
+.taskgraph/
