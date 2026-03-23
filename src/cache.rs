@@ -54,3 +54,51 @@ impl Cache {
         self.task_hashes.insert(task_id, hash);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cache_new() {
+        let cache = Cache::new(PathBuf::from(".taskgraph"));
+        assert_eq!(cache.path(), &PathBuf::from(".taskgraph"));
+        assert_eq!(cache.cache_file(), PathBuf::from(".taskgraph/cache.json"));
+    }
+
+    #[test]
+    fn test_has_changed_missing_file() {
+        let cache = Cache::new(PathBuf::from(".taskgraph"));
+        assert!(cache.has_changed("missing.md", 100));
+    }
+
+    #[test]
+    fn test_has_changed_same_mtime() {
+        let mut cache = Cache::new(PathBuf::from(".taskgraph"));
+        cache.update_mtime("task.md".to_string(), 100);
+        assert!(!cache.has_changed("task.md", 100));
+    }
+
+    #[test]
+    fn test_has_changed_different_mtime() {
+        let mut cache = Cache::new(PathBuf::from(".taskgraph"));
+        cache.update_mtime("task.md".to_string(), 100);
+        assert!(cache.has_changed("task.md", 200));
+    }
+
+    #[test]
+    fn test_task_hash() {
+        let mut cache = Cache::new(PathBuf::from(".taskgraph"));
+        cache.set_hash("task-1".to_string(), 12345);
+        assert_eq!(cache.get_hash("task-1"), Some(12345));
+        assert_eq!(cache.get_hash("missing"), None);
+    }
+
+    #[test]
+    fn test_update_mtime() {
+        let mut cache = Cache::new(PathBuf::from(".taskgraph"));
+        cache.update_mtime("task.md".to_string(), 100);
+        cache.update_mtime("task.md".to_string(), 200);
+        assert!(!cache.has_changed("task.md", 200));
+    }
+}

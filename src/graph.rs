@@ -336,3 +336,202 @@ impl Default for DependencyGraph {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn create_test_graph() -> DependencyGraph {
+        let mut graph = DependencyGraph::new();
+        graph.add_task("a".to_string());
+        graph.add_task("b".to_string());
+        graph.add_task("c".to_string());
+        graph.add_task("d".to_string());
+        graph.add_dependency("a", "b");
+        graph.add_dependency("b", "c");
+        graph.add_dependency("a", "d");
+        graph
+    }
+
+    #[test]
+    fn test_empty_graph() {
+        let graph = DependencyGraph::new();
+        assert!(!graph.has_cycles());
+        assert_eq!(graph.topological_order(), Some(Vec::<String>::new()));
+        assert_eq!(graph.parallel_groups(), Vec::<Vec<String>>::new());
+    }
+
+    #[test]
+    fn test_add_task() {
+        let mut graph = DependencyGraph::new();
+        graph.add_task("task-1".to_string());
+        assert_eq!(graph.dependencies("task-1"), Vec::<String>::new());
+        assert_eq!(graph.dependents("task-1"), Vec::<String>::new());
+    }
+
+    #[test]
+    fn test_add_dependency() {
+        let mut graph = DependencyGraph::new();
+        graph.add_task("a".to_string());
+        graph.add_task("b".to_string());
+        graph.add_dependency("a", "b");
+
+        assert_eq!(graph.dependencies("b"), vec!["a".to_string()]);
+        assert_eq!(graph.dependents("a"), vec!["b".to_string()]);
+    }
+
+    #[test]
+    fn test_missing_dependency_ignored() {
+        let mut graph = DependencyGraph::new();
+        graph.add_task("a".to_string());
+        graph.add_dependency("missing", "a");
+        graph.add_dependency("a", "missing");
+
+        assert_eq!(graph.dependencies("a"), Vec::<String>::new());
+        assert_eq!(graph.dependents("a"), Vec::<String>::new());
+    }
+
+    #[test]
+    fn test_no_cycles() {
+        let graph = create_test_graph();
+        assert!(!graph.has_cycles());
+        assert!(graph.find_cycles().is_empty());
+    }
+
+    #[test]
+    fn test_cycle_detection() {
+        let mut graph = DependencyGraph::new();
+        graph.add_task("a".to_string());
+        graph.add_task("b".to_string());
+        graph.add_task("c".to_string());
+        graph.add_dependency("a", "b");
+        graph.add_dependency("b", "c");
+        graph.add_dependency("c", "a");
+
+        assert!(graph.has_cycles());
+        let cycles = graph.find_cycles();
+        assert!(!cycles.is_empty());
+    }
+
+    #[test]
+    fn test_topological_order() {
+        let graph = create_test_graph();
+        let order = graph.topological_order().unwrap();
+
+        assert!(
+            order.iter().position(|x| x == "a").unwrap()
+                < order.iter().position(|x| x == "b").unwrap()
+        );
+        assert!(
+            order.iter().position(|x| x == "b").unwrap()
+                < order.iter().position(|x| x == "c").unwrap()
+        );
+        assert!(
+            order.iter().position(|x| x == "a").unwrap()
+                < order.iter().position(|x| x == "d").unwrap()
+        );
+    }
+
+    #[test]
+    fn test_topological_order_with_cycle() {
+        let mut graph = DependencyGraph::new();
+        graph.add_task("a".to_string());
+        graph.add_task("b".to_string());
+        graph.add_dependency("a", "b");
+        graph.add_dependency("b", "a");
+
+        assert!(graph.topological_order().is_none());
+    }
+
+    #[test]
+    fn test_parallel_groups() {
+        let mut graph = DependencyGraph::new();
+        graph.add_task("a".to_string());
+        graph.add_task("b".to_string());
+        graph.add_task("c".to_string());
+        graph.add_dependency("a", "b");
+        graph.add_dependency("a", "c");
+
+        let groups = graph.parallel_groups();
+
+        assert_eq!(groups.len(), 2);
+        assert_eq!(groups[0], vec!["a".to_string()]);
+        assert!(groups[1].contains(&"b".to_string()));
+        assert!(groups[1].contains(&"c".to_string()));
+    }
+
+    #[test]
+    fn test_parallel_groups_linear() {
+        let mut graph = DependencyGraph::new();
+        graph.add_task("a".to_string());
+        graph.add_task("b".to_string());
+        graph.add_task("c".to_string());
+        graph.add_dependency("a", "b");
+        graph.add_dependency("b", "c");
+
+        let groups = graph.parallel_groups();
+
+        assert_eq!(groups.len(), 3);
+        assert_eq!(groups[0], vec!["a".to_string()]);
+        assert_eq!(groups[1], vec!["b".to_string()]);
+        assert_eq!(groups[2], vec!["c".to_string()]);
+    }
+
+    #[test]
+    fn test_critical_path() {
+        let graph = create_test_graph();
+        let path = graph.critical_path();
+
+        assert!(path.contains(&"a".to_string()));
+        assert!(path.contains(&"b".to_string()));
+        assert!(path.contains(&"c".to_string()));
+        assert_eq!(path.len(), 3);
+    }
+
+    #[test]
+    fn test_critical_path_single_node() {
+        let mut graph = DependencyGraph::new();
+        graph.add_task("alone".to_string());
+
+        let path = graph.critical_path();
+        assert_eq!(path, vec!["alone".to_string()]);
+    }
+
+    #[test]
+    fn test_bottlenecks() {
+        let mut graph = DependencyGraph::new();
+        graph.add_task("a".to_string());
+        graph.add_task("b".to_string());
+        graph.add_task("c".to_string());
+        graph.add_dependency("a", "b");
+        graph.add_dependency("b", "c");
+
+        let bottlenecks = graph.bottlenecks();
+
+        assert!(!bottlenecks.is_empty());
+        assert!(bottlenecks.iter().any(|(id, _)| id == "b"));
+    }
+
+    #[test]
+    fn test_to_dot() {
+        let graph = create_test_graph();
+        let dot = graph.to_dot();
+
+        assert!(dot.contains("digraph taskgraph"));
+        assert!(dot.contains("\"a\""));
+        assert!(dot.contains("\"b\""));
+        assert!(dot.contains("\"a\" -> \"b\""));
+    }
+
+    #[test]
+    fn test_dependencies_unknown_task() {
+        let graph = DependencyGraph::new();
+        assert!(graph.dependencies("unknown").is_empty());
+    }
+
+    #[test]
+    fn test_dependents_unknown_task() {
+        let graph = DependencyGraph::new();
+        assert!(graph.dependents("unknown").is_empty());
+    }
+}

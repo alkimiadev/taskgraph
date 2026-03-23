@@ -209,12 +209,22 @@ impl EmbeddingIndex {
         let tensors = safetensors::SafeTensors::deserialize(&buffer)
             .map_err(|e| crate::Error::Graph(format!("Failed to load embeddings: {}", e)))?;
 
-        let metadata_tensor = tensors.tensor("__metadata__").ok();
-        let metadata: EmbeddingMetadata = if let Some(tensor) = metadata_tensor {
-            let meta_str = std::str::from_utf8(tensor.data())
-                .map_err(|e| crate::Error::Graph(format!("Invalid metadata: {}", e)))?;
-            serde_json::from_str(meta_str)
-                .map_err(|e| crate::Error::Graph(format!("Failed to parse metadata: {}", e)))?
+        let (_, raw_metadata) = safetensors::SafeTensors::read_metadata(&buffer)
+            .map_err(|e| crate::Error::Graph(format!("Failed to read metadata: {}", e)))?;
+
+        let metadata: EmbeddingMetadata = if let Some(meta_map) = raw_metadata.metadata() {
+            if let Some(meta_str) = meta_map.get("__metadata__") {
+                serde_json::from_str(meta_str)
+                    .map_err(|e| crate::Error::Graph(format!("Failed to parse metadata: {}", e)))?
+            } else {
+                EmbeddingMetadata::new(
+                    DEFAULT_MODEL_ID,
+                    DEFAULT_EMBEDDING_DIM,
+                    DEFAULT_WINDOW_SIZE,
+                    DEFAULT_OVERLAP,
+                    0,
+                )
+            }
         } else {
             EmbeddingMetadata::new(
                 DEFAULT_MODEL_ID,
@@ -445,5 +455,75 @@ mod tests {
 
         let d = vec![0.707, 0.707, 0.0];
         assert!((cosine_similarity(&a, &d) - 0.707).abs() < 0.01);
+    }
+
+    #[test]
+    fn test_embedding_index_roundtrip() {
+        use tempfile::tempdir;
+
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("test.safetensors");
+
+        let mut path_map = std::collections::HashMap::new();
+        path_map.insert(12345u64, "tasks/test.md".to_string());
+
+        let embeddings =
+            ndarray::Array2::from_shape_vec((2, 4), vec![0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8])
+                .unwrap();
+
+        let indices = vec![
+            WindowIndex::new(12345, 0, 512, 0, 1024),
+            WindowIndex::new(12345, 512, 1024, 1024, 2048),
+        ];
+
+        let metadata =
+            EmbeddingMetadata::new("test-model", 4, DEFAULT_WINDOW_SIZE, DEFAULT_OVERLAP, 1);
+
+        let index = EmbeddingIndex {
+            embeddings,
+            indices,
+            metadata,
+            path_map,
+        };
+
+        index.save(&path).unwrap();
+        assert!(path.exists());
+
+        let loaded = EmbeddingIndex::load(&path).unwrap();
+
+        assert_eq!(loaded.metadata.model_id, "test-model");
+        assert_eq!(loaded.metadata.embedding_dim, 4);
+        assert_eq!(loaded.metadata.file_count, 1);
+        assert_eq!(loaded.indices.len(), 2);
+        assert_eq!(loaded.indices[0].file_path_hash, 12345);
+        assert_eq!(
+            loaded.path_map.get(&12345),
+            Some(&"tasks/test.md".to_string())
+        );
+
+        let expected: Vec<f32> = vec![0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
+        let loaded_vec: Vec<f32> = loaded.embeddings.iter().copied().collect();
+        for (a, b) in expected.iter().zip(loaded_vec.iter()) {
+            assert!((a - b).abs() < 1e-6);
+        }
+    }
+
+    #[test]
+    fn test_cosine_similarity_empty() {
+        assert_eq!(cosine_similarity(&[], &[]), 0.0);
+    }
+
+    #[test]
+    fn test_cosine_similarity_zero_vector() {
+        let a = vec![0.0, 0.0, 0.0];
+        let b = vec![1.0, 2.0, 3.0];
+        assert_eq!(cosine_similarity(&a, &b), 0.0);
+    }
+
+    #[test]
+    fn test_cosine_similarity_different_lengths() {
+        let a = vec![1.0, 2.0];
+        let b = vec![1.0, 2.0, 3.0];
+        assert_eq!(cosine_similarity(&a, &b), 0.0);
     }
 }
