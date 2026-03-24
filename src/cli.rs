@@ -132,6 +132,7 @@ impl Cli {
                     name.as_deref(),
                     scope.as_deref(),
                     risk.as_deref(),
+                    &self.tasks_path(),
                 )?;
             }
             Commands::Validate => {

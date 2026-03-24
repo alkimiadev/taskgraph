@@ -1,6 +1,6 @@
 //! Initialize/scaffold a new task file.
 
-use std::path::PathBuf;
+use std::path::Path;
 
 use crate::task::{Task, TaskFrontmatter, TaskRisk, TaskScope, TaskStatus};
 use chrono::Utc;
@@ -10,10 +10,10 @@ pub fn execute(
     name: Option<&str>,
     scope: Option<&str>,
     risk: Option<&str>,
+    tasks_dir: &Path,
 ) -> crate::Result<()> {
-    let tasks_dir = PathBuf::from("./tasks");
     if !tasks_dir.exists() {
-        std::fs::create_dir_all(&tasks_dir)?;
+        std::fs::create_dir_all(tasks_dir)?;
     }
 
     let file_path = tasks_dir.join(format!("{}.md", id));
