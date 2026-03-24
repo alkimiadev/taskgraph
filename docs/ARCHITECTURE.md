@@ -270,14 +270,14 @@ These commands surface structural risk patterns rather than precise cost calcula
 ```
 taskgraph risk                   # Show risk distribution across tasks
 taskgraph risk-path              # Highest risk path through graph
-taskgraph decompose-check        # Flag tasks that should be split (risk > medium)
+taskgraph decompose              # Flag tasks that should be split
 taskgraph workflow-cost          # Relative workflow cost comparison
 ```
 
 | Command | Structural Question |
 |---------|---------------------|
 | `risk` | Where is risk concentrated in the graph? |
-| `decompose-check` | Which upstream tasks should be split? |
+| `decompose` | Which upstream tasks should be split? |
 | `risk-path` | Which failure chain has most downstream damage? |
 | `workflow-cost` | Relative comparison - path A vs path B |
 
@@ -441,14 +441,13 @@ taskgraph/
 │   ├── task.rs             # Task struct & parsing
 │   ├── graph.rs            # Graph building & operations
 │   ├── cache.rs            # Cache management
-│   ├── commands/
-│   │   ├── mod.rs
-│   │   ├── list.rs
-│   │   ├── show.rs
-│   │   ├── deps.rs
-│   │   ├── topo.rs
-│   │   └── ...
-│   └── output.rs           # Output formatting
+│   └── commands/
+│       ├── mod.rs
+│       ├── list.rs
+│       ├── show.rs
+│       ├── deps.rs
+│       ├── topo.rs
+│       └── ...
 └── tests/
     ├── integration/
     └── fixtures/

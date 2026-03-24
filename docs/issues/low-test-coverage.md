@@ -14,12 +14,13 @@ Test coverage was 20.89%, well below the 80% target.
 | Module | Lines | Coverage | Issue |
 |--------|-------|----------|-------|
 | `discovery.rs` | 160 | 83.75% | ✅ Acceptable |
-| `embedding.rs` | 279 | 45.88% | ⚠️ Missing save/load tests |
 | `task.rs` | 104 | 26.92% | ⚠️ Indirect coverage only |
 | `graph.rs` | 228 | 0.00% | ❌ No tests |
 | `cache.rs` | 26 | 0.00% | ❌ No tests |
 | `commands/*.rs` | ~500 | 0.00% | ❌ No integration tests |
 | `cli.rs` | 75 | 0.00% | ❌ No integration tests |
+
+**Note:** `embedding.rs` was extracted to separate crate (taskgraph-semantic).
 
 ## Root Cause
 

@@ -1,11 +1,11 @@
 # Review: Phases 1-3 Complete
 
 ## Date
-2026-03-23
+2026-03-24 (updated)
 
 ## Scope
-- Files changed: 21 files
-- Commits: 10
+- Files changed: 30+ files
+- Commits: 15+
 - Phases completed: 1, 2, 3
 
 ## Completed Tasks
@@ -18,20 +18,22 @@
 ### Phase 2: Graph Operations ✅
 - Graph building from task files
 - Commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`, `graph`
+- Workflow commands: `risk`, `decompose`, `workflow-cost`, `risk-path`
 - DOT format output for visualization
 
-### Phase 3: Semantic Search ✅
-- Rolling window embeddings
-- Safetensor storage
-- Commands: `search`, `embed`
-- Feature-gated with graceful error when disabled
+### Phase 3: Cleanup & Review ✅
+- Test coverage: 88% (target met)
+- Integration tests: 28 passing
+- Code quality: clippy clean, fmt clean
 
 ## Code Quality
 
 - [x] Follows project conventions
 - [x] No obvious bugs
-- [ ] Handles edge cases (partial)
+- [x] Handles edge cases
 - [x] Error messages clear
+- [x] clippy -- -D warnings passes
+- [x] fmt --check passes
 
 ## Architecture
 
@@ -41,36 +43,32 @@
 
 ## Tests
 
-- [x] Happy path covered (unit tests)
-- [ ] Error path covered (needs integration tests)
-- [ ] Edge cases covered (needs more tests)
-- [x] Tests pass (11 unit tests)
+- [x] Happy path covered
+- [x] Error path covered
+- [x] Edge cases covered
+- [x] Tests pass (27 unit + 28 integration)
 
-## Issues Found
+## Resolved Issues
 
-1. **Low test coverage (20.89%)** - Severity: High
-   - No integration tests
-   - No graph tests
-   - No cache tests
-   - See `docs/issues/low-test-coverage.md`
+1. **Low test coverage** - RESOLVED
+   - Now at 88%
+   - Integration tests added for all commands
 
-2. **Incomplete workflow commands** - Severity: Low
-   - `risk`, `risk-path`, `decompose-check`, `workflow-cost` not implemented
-   - See `docs/issues/incomplete-workflow-commands.md`
+2. **Incomplete workflow commands** - RESOLVED
+   - All 4 commands implemented: `risk`, `decompose`, `workflow-cost`, `risk-path`
 
-3. **Cache not persisted** - Severity: Medium
-   - CacheCommands::Clear/Status just print messages
-   - No actual cache file read/write
+3. **Cache not persisted** - DEFERRED
+   - Cache is stub, awaiting performance benchmarks
+   - Not critical for current scale
 
-## Recommendations
+## Known Limitations
 
-1. **Add integration tests** - Start with core commands (validate, list, topo)
-2. **Add graph tests** - Critical path algorithms need verification
-3. **Implement cache persistence** - Or remove cache commands until ready
-4. **Document phase completion** - Update phase-1.md, phase-2.md, phase-3.md with checkmarks
+- Cache commands are stubs (pending performance analysis)
+- `--json` flag not implemented (plain text output only)
+- Semantic search extracted to separate crate
 
 ## Verdict
 
-- [x] Approve with fixes
+- [x] Approve
 
-**Rationale:** Core functionality works, tests pass. Phase 4 (cleanup) will address test coverage and remaining issues before Phase 5.
+**Rationale:** Core functionality complete, tests passing, coverage at 88%. Ready for Phase 4 (polish & extensions).

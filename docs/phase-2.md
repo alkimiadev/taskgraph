@@ -134,9 +134,9 @@ petgraph::dot::Dot::new(&graph)                   // DOT format output
 - [x] Parallel generation grouping
 - [x] Critical path calculation
 - [x] Bottleneck identification
-- [ ] Cache rebuild detection (cache not implemented)
-- [ ] Risk distribution calculation (not implemented)
-- [ ] Workflow EV calculation (not implemented)
+- [ ] Cache rebuild detection (cache stub, not implemented)
+- [x] Risk distribution calculation
+- [x] Workflow EV calculation
 
 ## Success Criteria
 

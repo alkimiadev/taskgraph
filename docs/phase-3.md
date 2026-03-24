@@ -37,29 +37,21 @@ Address technical debt, improve test coverage, and ensure production readiness b
 - [ ] Review `graph.rs` for algorithm correctness
 - [ ] Review all public API documentation
 
-### 3.3 Missing Features Review
-
-Per `docs/issues/incomplete-workflow-commands.md`:
-- [ ] Review if `risk` command is needed
-- [ ] Review if `risk-path` command is needed
-- [ ] Review if `decompose-check` command is needed
-- [ ] Review if `workflow-cost` command is needed
-
-### 3.4 Documentation Review
+### 3.3 Documentation Review
 
 - [x] Verify README accuracy
 - [x] Check ARCHITECTURE.md reflects current state
 - [ ] Update phase docs with completion status
 - [ ] Add inline code documentation where missing
 
-### 3.5 Code Quality
+### 3.4 Code Quality
 
 - [ ] Run `cargo clippy -- -D warnings`
 - [ ] Run `cargo fmt --check`
 - [ ] Remove dead code (if any)
 - [ ] Consolidate duplicate code patterns
 
-### 3.6 Performance Baseline
+### 3.5 Performance Baseline
 
 - [ ] Benchmark task discovery (100, 1000 tasks)
 - [ ] Document performance characteristics

@@ -89,6 +89,15 @@ Detailed description of the task goes here.
 | `bottleneck` | Show bottleneck tasks |
 | `graph` | Output graph in DOT format |
 
+### Workflow Analysis
+
+| Command | Description |
+|---------|-------------|
+| `risk` | Show risk distribution across tasks |
+| `decompose` | Flag tasks that should be split |
+| `workflow-cost` | Calculate relative workflow cost |
+| `risk-path` | Find path with highest cumulative risk |
+
 ## Project Structure
 
 ```

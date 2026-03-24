@@ -32,7 +32,7 @@ These commands surface **structural risk patterns** rather than precise dollar a
 | Command | Structural Question |
 |---------|---------------------|
 | `risk` | Where is risk concentrated in the graph? |
-| `decompose-check` | Which upstream tasks should be split? |
+| `decompose` | Which upstream tasks should be split? |
 | `risk-path` | Which failure chain has most downstream damage? |
 | `workflow-cost` | Relative comparison - path A vs path B |
 
@@ -109,7 +109,7 @@ The formula captures the intuition that failure cost compounds, but the numeric 
 - Weight edges by risk/impact
 - Use existing critical path algorithm with weights
 
-### `decompose-check` (simple)
+### `decompose` (simple)
 - Filter tasks where `risk > medium` OR `scope > moderate`
 - Output: list with reasons
 - No graph needed
@@ -122,6 +122,6 @@ The formula captures the intuition that failure cost compounds, but the numeric 
 ## Next Steps
 
 1. Implement `risk` command (simple aggregation)
-2. Implement `decompose-check` (filter + flag)
+2. Implement `decompose` (filter + flag)
 3. Implement `workflow-cost` (EV calculation)
 4. Implement `risk-path` (path analysis with weights)
