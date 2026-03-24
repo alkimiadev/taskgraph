@@ -90,6 +90,9 @@ pub enum Commands {
     /// Show risk distribution across tasks
     Risk,
 
+    /// Flag tasks that should be decomposed
+    Decompose,
+
     /// Visualize the dependency graph (DOT format)
     Graph {
         /// Output file (stdout if not specified)
@@ -195,6 +198,10 @@ impl Cli {
             Commands::Risk => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
                 crate::commands::risk::execute(&collection)?;
+            }
+            Commands::Decompose => {
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::decompose::execute(&collection)?;
             }
             Commands::Graph { output } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());

@@ -263,6 +263,34 @@ fn test_risk_command_empty() {
 }
 
 #[test]
+fn test_decompose_command() {
+    taskgraph()
+        .arg("-p")
+        .arg("tests/fixtures/decompose")
+        .arg("decompose")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Tasks that should be decomposed"))
+        .stdout(predicate::str::contains("task-high-risk"))
+        .stdout(predicate::str::contains("task-broad-scope"))
+        .stdout(predicate::str::contains("task-system-scope"))
+        .stdout(predicate::str::contains("risk: high"))
+        .stdout(predicate::str::contains("scope: broad"))
+        .stdout(predicate::str::contains("scope: system"));
+}
+
+#[test]
+fn test_decompose_command_none_needed() {
+    taskgraph()
+        .arg("-p")
+        .arg("tests/fixtures/tasks")
+        .arg("decompose")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("No tasks need decomposition"));
+}
+
+#[test]
 fn test_help_flag() {
     taskgraph()
         .arg("--help")
