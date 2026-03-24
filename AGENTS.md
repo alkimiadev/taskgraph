@@ -58,11 +58,11 @@ CLI args → Command →
 - [x] Commands: `init`, `validate`, `list`, `show`
 - [x] Output formatting (plain, JSON)
 
-### Phase 2: Graph Operations ✅ (mostly)
+### Phase 2: Graph Operations ✅
 - [x] Graph building from task files
 - [ ] Cache system (`.taskgraph/cache.json`) - stub only, not critical
 - [x] Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`
-- [ ] Workflow analysis: `risk`, `risk-path`, `decompose-check`, `workflow-cost` - deferred
+- [x] Workflow analysis: `risk`, `risk-path`, `decompose`, `workflow-cost`
 - [x] DOT format output for visualization
 
 ### Phase 3: Cleanup & Review (in progress)
@@ -296,7 +296,7 @@ taskgraph/
 
 ## Current Status
 
-**Phase 1: Complete.** Phase 2: Mostly complete (workflow commands deferred, cache stub). Phase 3 in progress.
+**Phase 1-2: Complete.** Phase 3 in progress (coverage at 88%).
 
 ## Implementation Guide
 
