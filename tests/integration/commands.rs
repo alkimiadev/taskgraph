@@ -233,6 +233,36 @@ fn test_init_with_options() {
 }
 
 #[test]
+fn test_risk_command() {
+    taskgraph()
+        .arg("-p")
+        .arg("tests/fixtures/risk")
+        .arg("risk")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Risk Distribution"))
+        .stdout(predicate::str::contains("CRITICAL: 1"))
+        .stdout(predicate::str::contains("HIGH: 1"))
+        .stdout(predicate::str::contains("MEDIUM: 1"))
+        .stdout(predicate::str::contains("LOW: 1"))
+        .stdout(predicate::str::contains("UNSPECIFIED: 1"));
+}
+
+#[test]
+fn test_risk_command_empty() {
+    let temp_dir = tempfile::tempdir().unwrap();
+    let temp_path = temp_dir.path().to_str().unwrap();
+
+    taskgraph()
+        .arg("-p")
+        .arg(temp_path)
+        .arg("risk")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("No tasks found"));
+}
+
+#[test]
 fn test_help_flag() {
     taskgraph()
         .arg("--help")

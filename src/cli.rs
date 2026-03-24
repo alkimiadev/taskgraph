@@ -87,6 +87,9 @@ pub enum Commands {
     /// Show bottleneck tasks (high betweenness centrality)
     Bottleneck,
 
+    /// Show risk distribution across tasks
+    Risk,
+
     /// Visualize the dependency graph (DOT format)
     Graph {
         /// Output file (stdout if not specified)
@@ -188,6 +191,10 @@ impl Cli {
             Commands::Bottleneck => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
                 crate::commands::bottleneck::execute(&collection)?;
+            }
+            Commands::Risk => {
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::risk::execute(&collection)?;
             }
             Commands::Graph { output } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());

@@ -9,6 +9,7 @@ pub mod graph_cmd;
 pub mod init;
 pub mod list;
 pub mod parallel;
+pub mod risk;
 pub mod show;
 pub mod topo;
 pub mod validate;
