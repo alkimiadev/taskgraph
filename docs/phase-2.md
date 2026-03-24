@@ -4,7 +4,7 @@
 
 Build and analyze dependency graphs. Implement cache for performance.
 
-## Status: ✅ MOSTLY COMPLETE (see gaps below)
+## Status: ✅ COMPLETE (cache stub only)
 
 ## Tasks
 
@@ -68,33 +68,27 @@ Build and analyze dependency graphs. Implement cache for performance.
 - [x] `--output file.dot` to save
 - [x] Pipe to graphviz: `taskgraph graph | dot -Tpng -o graph.png`
 
-### 2.4 Workflow Analysis Commands ⏳ NOT IMPLEMENTED
+### 2.4 Workflow Analysis Commands ✅
 
-See `docs/issues/incomplete-workflow-commands.md` for details.
+#### `risk` ✅
+- [x] Show risk distribution (count by level)
+- [x] List tasks per level
+- [x] Output: summary + details
 
-#### `risk` ❌
-- [ ] Show risk distribution (count by level)
-- [ ] List high/critical tasks
-- [ ] Output: summary + details
+#### `risk-path` ✅
+- [x] Find path with highest cumulative risk
+- [x] Combine risk + impact along paths
+- [x] Output: path with risk score
 
-#### `risk-path` ❌
-- [ ] Find path with highest cumulative risk
-- [ ] Combine risk + impact along paths
-- [ ] Output: path with risk score
+#### `decompose` ✅
+- [x] Flag tasks where `risk > medium` OR `scope > moderate`
+- [x] These should be decomposed further
+- [x] Output: list with reasons
 
-#### `decompose-check` ❌
-- [ ] Flag tasks where `risk > medium` OR `scope > moderate`
-- [ ] These should be decomposed further
-- [ ] Output: list with reasons
-
-#### `workflow-cost` ❌
-- [ ] Implement EV calculation from cost-benefit framework
-- [ ] Use categorical → numeric mappings
-- [ ] Default params: F=20, t=0.5, v=100
-- [ ] CLI overrides: `--fallback-cost`, `--time-lost`, `--value-rate`
-- [ ] Output: expected cost in $
-
-**Status**: Not blocking. These are independent features that can be added later.
+#### `workflow-cost` ✅
+- [x] Implement EV calculation from cost-benefit framework
+- [x] Use categorical → numeric mappings
+- [x] Output: relative units (not $)
 
 ## Assumption Points (Resolved)
 

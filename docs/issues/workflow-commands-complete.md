@@ -1,24 +1,27 @@
-# Incomplete: Workflow Analysis Commands
+# Complete: Workflow Analysis Commands
 
 ## Context
 - Phase: 2
 - Task: Workflow analysis commands
 - Date: 2026-03-23
 
-## Problem
+## Resolution
 
-Four workflow analysis commands from phase-2.md were not implemented:
+All four workflow analysis commands implemented:
 
 | Command | Description | Status |
 |---------|-------------|--------|
-| `risk` | Show risk distribution across tasks | Not implemented |
-| `risk-path` | Find path with highest cumulative risk | Not implemented |
-| `decompose-check` | Flag tasks that should be split | Not implemented |
-| `workflow-cost` | Relative workflow cost comparison | Not implemented |
+| `risk` | Show risk distribution across tasks | ✅ Implemented |
+| `risk-path` | Find path with highest cumulative risk | ✅ Implemented |
+| `decompose` | Flag tasks that should be split | ✅ Implemented |
+| `workflow-cost` | Relative workflow cost comparison | ✅ Implemented |
 
-## Status
+## Implementation Commits
 
-Not blocking - these are independent features that can be added later.
+- `5141a93` feat: add risk command
+- `352d6f2` feat: add decompose command
+- `5ef25a2` feat: add workflow-cost command
+- `2bd3b66` feat: add risk-path command
 
 ## Design Philosophy
 
