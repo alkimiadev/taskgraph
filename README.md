@@ -101,12 +101,6 @@ project/
     └── cache.json              # Graph cache
 ```
 
-## Semantic Search
-
-Semantic search has been extracted to a separate crate: [taskgraph-semantic](https://github.com/alkimiadev/taskgraph-semantic).
-
-It provides embedding-based similarity search across task descriptions and can be used independently or integrated with taskgraph.
-
 ## License
 
 Licensed under either of Apache License, Version 2.0 or MIT license at your option.

@@ -74,5 +74,4 @@ Per `docs/issues/incomplete-workflow-commands.md`:
 
 ## Notes
 
-- Semantic search has been extracted to [taskgraph-semantic](../taskgraph-semantic/)
-- Test coverage improved from 20.89% → 68.40% → ~80% (semantic extraction removed untested code)
+- Test coverage improved from 20.89% → 68.40% → ~80%

@@ -45,8 +45,6 @@ Only unit tests existed. No integration tests exercising CLI command paths.
 | `task.rs` | 104 | 37.50% | ⚠️ Indirect coverage |
 | `commands/*.rs` | ~400 | ~60-95% | ✅ Mixed |
 
-**Note**: `embedding.rs` removed via extraction to `taskgraph-semantic`.
-
 ## Status: ✅ RESOLVED
 
 The 80% soft target has been met. Remaining gaps:

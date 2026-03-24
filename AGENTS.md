@@ -77,10 +77,6 @@ CLI args → Command →
 - [ ] File watching (`--watch`)
 - [ ] Distribution (cargo publish, binaries)
 
-### Semantic Search
-
-Extracted to [taskgraph-semantic](../taskgraph-semantic/) for independent development.
-
 ## Available Tools
 
 ### Core
@@ -198,7 +194,7 @@ let collection = TaskCollection::from_directory(PathBuf::from("./tasks"));
 
 Before committing changes:
 
-- [ ] `cargo test --all-features` passes
+- [ ] `cargo test --all-features` passes (includes unit + doc tests)
 - [ ] `cargo clippy -- -D warnings` passes
 - [ ] `cargo fmt --check` passes
 - [ ] New code has tests
@@ -208,7 +204,8 @@ Before committing changes:
 
 ```bash
 cargo build
-cargo test --all-features
+cargo test --all-features          # Unit + integration tests
+cargo test --doc --all-features    # Doc tests only
 cargo clippy -- -D warnings
 cargo fmt --check
 ```
@@ -263,9 +260,6 @@ When implementing, you can reference the source code for any dependency. For exa
 - `/workspace/@alkminer/reference/spec-driven-dev/README.md` - SDD framework that uses TaskGraph
 - `/workspace/@alkminer/reference/spec-driven-dev/prompts/task-decomposer.md` - Agent role spec
 - `/workspace/@alkminer/reference/spec-driven-dev/cost_benefit_analysis_framework.py` - EV formula for workflow-cost
-
-### Related Projects
-- `/workspace/@alkimiadev/taskgraph-semantic/` - Semantic search layer (extracted)
 
 ## Directory Structure
 

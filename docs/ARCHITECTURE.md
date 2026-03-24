@@ -107,11 +107,6 @@ taskgraph server --watch
 
 This is optional - CLI-first design covers most use cases.
 
-### Semantic Search
-
-Semantic search has been extracted to a separate crate: [taskgraph-semantic](../taskgraph-semantic/).
-See that project for embedding-based similarity search across task descriptions.
-
 ## Core Concept
 
 **Tasks as Files**: Each task is a markdown file with YAML frontmatter for structured data and a body for free-form description.
@@ -333,7 +328,6 @@ This direction gives correct topological order: A, B, C
 |-------|---------|
 | `tokio` | Async runtime (if needed for file watching) |
 | `notify` | File system watching (for `--watch` mode) |
-| `ratatui` | TUI interface (for interactive mode) |
 
 ## Graph Operations Detail
 
