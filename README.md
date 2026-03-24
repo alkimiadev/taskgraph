@@ -63,6 +63,7 @@ Detailed description of the task goes here.
 | `scope` | enum | single, narrow, moderate, broad, system |
 | `risk` | enum | trivial, low, medium, high, critical |
 | `impact` | enum | isolated, component, phase, project |
+| `level` | enum | planning, decomposition, implementation, review, research |
 | `tags` | string[] | Arbitrary tags for filtering |
 
 ## Commands
@@ -102,13 +103,17 @@ Detailed description of the task goes here.
 
 ```
 project/
-├── tasks/
-│   ├── task-one.md
-│   ├── task-two.md
-│   └── ...
-└── .taskgraph/
-    └── logs/
+└── tasks/
+    ├── task-one.md
+    ├── task-two.md
+    └── ...
 ```
+
+## Learn More
+
+- [Workflow Guide](docs/workflow.md) — Practical usage patterns and phases
+- [Framework](docs/framework.md) — Why categorical estimates over numeric costs
+- [Architecture](docs/ARCHITECTURE.md) — Technical design decisions
 
 ## License
 

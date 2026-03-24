@@ -210,7 +210,7 @@ taskgraph topo --status pending
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | string | Unique identifier |
-| `title` | string | Human-readable name |
+| `name` | string | Human-readable name |
 
 ### Recommended Fields
 

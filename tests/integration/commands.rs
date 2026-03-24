@@ -358,3 +358,33 @@ fn test_help_flag() {
 fn test_version_flag() {
     taskgraph().arg("--version").assert().success();
 }
+
+#[test]
+fn test_completions_bash() {
+    taskgraph()
+        .arg("completions")
+        .arg("bash")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("_taskgraph()"));
+}
+
+#[test]
+fn test_completions_zsh() {
+    taskgraph()
+        .arg("completions")
+        .arg("zsh")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("#compdef taskgraph"));
+}
+
+#[test]
+fn test_completions_fish() {
+    taskgraph()
+        .arg("completions")
+        .arg("fish")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("complete -c taskgraph"));
+}

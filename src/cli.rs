@@ -2,7 +2,8 @@
 
 use std::path::PathBuf;
 
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
+use clap_complete::Shell;
 
 use crate::discovery::TaskCollection;
 use crate::graph::DependencyGraph;
@@ -105,6 +106,20 @@ pub enum Commands {
         #[arg(short, long)]
         output: Option<String>,
     },
+
+    /// Generate shell completions
+    Completions {
+        /// Shell to generate completions for
+        shell: ShellName,
+    },
+}
+
+/// Supported shell names for completion generation.
+#[derive(Clone, Debug, ValueEnum)]
+pub enum ShellName {
+    Bash,
+    Zsh,
+    Fish,
 }
 
 impl Cli {
@@ -206,6 +221,19 @@ impl Cli {
             Commands::Graph { output } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
                 crate::commands::graph_cmd::execute(&collection, output.as_deref())?;
+            }
+            Commands::Completions { shell } => {
+                let shell = match shell {
+                    ShellName::Bash => Shell::Bash,
+                    ShellName::Zsh => Shell::Zsh,
+                    ShellName::Fish => Shell::Fish,
+                };
+                clap_complete::generate(
+                    shell,
+                    &mut Cli::command(),
+                    "taskgraph",
+                    &mut std::io::stdout(),
+                );
             }
         }
         Ok(())
