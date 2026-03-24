@@ -367,13 +367,15 @@ petgraph::algo::dijkstra // For path finding
 
 ## Output Formats
 
-All graph commands support:
+Current output is plain text only.
 
-| Flag | Format | Use Case |
-|------|--------|----------|
-| `--json` | JSON | Scripting, tooling |
-| `--dot` | Graphviz DOT | Visualization |
-| `--plain` | Plain text | Human reading (default) |
+| Flag | Format | Status |
+|------|--------|--------|
+| `--plain` | Plain text | Default, implemented |
+| `--json` | JSON | Not implemented |
+| `--dot` | Graphviz DOT | Graph command outputs DOT by default |
+
+JSON output could be added later if needed for scripting/tooling integration.
 
 ## Error Handling
 

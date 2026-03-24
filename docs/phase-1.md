@@ -58,7 +58,7 @@ The CLI adds value where manual methods fail (graph analysis). CRUD is just file
 
 ### 1.5 Output Formatting ✅
 - [x] Plain text (default)
-- [x] JSON (`--json` flag)
+- [ ] JSON (`--json` flag) - not implemented
 - [x] Consistent error messages
 
 ## What We're NOT Building

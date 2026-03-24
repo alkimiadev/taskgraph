@@ -8,7 +8,6 @@ pub mod commands;
 pub mod discovery;
 pub mod error;
 pub mod graph;
-pub mod output;
 pub mod task;
 
 pub use cache::Cache;
