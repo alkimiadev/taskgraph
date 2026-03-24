@@ -70,12 +70,11 @@ TaskGraph supports the [Spec-Driven Development (SDD) framework](/workspace/@alk
 - Output formatting (plain, JSON)
 - **No full CRUD** - files are source of truth, edited directly
 
-### Phase 2: Graph Operations ✅ (mostly)
+### Phase 2: Graph Operations ✅
 
 - Graph building from task files
-- Cache system (`.taskgraph/cache.json`) - stub only, not critical
 - Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`
-- Workflow analysis commands: deferred
+- Workflow analysis commands: `risk`, `risk-path`, `decompose`, `workflow-cost`
 - DOT format output for visualization
 
 ### Phase 3: Cleanup & Review (in progress)
@@ -118,7 +117,6 @@ project/
 │   ├── api-implementation.md
 │   └── deployment.md
 └── .taskgraph/
-    ├── cache.json
     └── logs/
 ```
 
@@ -241,7 +239,7 @@ taskgraph show <id>                    # Display task details
 
 **Note**: No full CRUD. Files are the source of truth. Edit files directly.
 
-### Graph Operations (Cache Helps)
+### Graph Operations
 
 These require building the full graph:
 
@@ -254,13 +252,6 @@ taskgraph parallel               # Groups of tasks that can run together
 taskgraph critical               # Longest path (completion blockers)
 taskgraph bottleneck             # High betweenness (on many paths)
 taskgraph graph                  # Visualize dependency graph (DOT format)
-```
-
-### Cache Management
-
-```
-taskgraph cache clear            # Clear the cache
-taskgraph cache status           # Show cache info (size, age, file count)
 ```
 
 ### Workflow Analysis (Structural Risk)
@@ -304,46 +295,6 @@ This direction gives correct topological order: A, B, C
 | "What does B depend on?" | Read B's frontmatter only |
 | "What depends on A?" | Scan all tasks for `depends_on: [A]` - needs full graph |
 
-## Cache Strategy
-
-### Cache Location
-
-```
-<project>/.taskgraph/cache.json
-```
-
-### Cache Contents
-
-```json
-{
-  "version": 1,
-  "built_at": "2026-03-23T10:00:00Z",
-  "files": {
-    "tasks/auth-setup.md": {
-      "mtime": 1711185600
-    }
-  },
-  "graph": {
-    "nodes": [...],
-    "edges": [...]
-  }
-}
-```
-
-**Note**: Uses mtime only for invalidation (fast, good enough).
-
-### Cache Validation
-
-1. On graph operation, check if `.taskgraph/cache.json` exists
-2. Compare file mtimes against cached values
-3. If any file changed (or new files exist), rebuild graph
-4. If all match, use cached graph
-
-### Cache Invalidation
-
-- Manual: `taskgraph cache clear`
-- Automatic: File modification detected
-
 ## Dependencies (Rust Crates)
 
 ### Core Dependencies
@@ -352,7 +303,7 @@ This direction gives correct topological order: A, B, C
 |-------|---------|-------|
 | `petgraph` | Graph data structure & algorithms | Stable, well-maintained |
 | `gray_matter` | Frontmatter extraction | Handles YAML/TOML/JSON frontmatter |
-| `serde` | Serialization | For frontmatter, cache, JSON output |
+| `serde` | Serialization | For frontmatter, JSON output |
 | `serde_yaml` | YAML parsing | Typed frontmatter deserialization |
 | `clap` | CLI argument parsing | Derive-based for clean code |
 | `chrono` | Date/time handling | For timestamps |
@@ -440,7 +391,6 @@ taskgraph/
 │   ├── cli.rs              # CLI definition (clap)
 │   ├── task.rs             # Task struct & parsing
 │   ├── graph.rs            # Graph building & operations
-│   ├── cache.rs            # Cache management
 │   └── commands/
 │       ├── mod.rs
 │       ├── list.rs

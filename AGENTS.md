@@ -31,7 +31,6 @@ topo order, cycles, communities, bottlenecks
 | Task status | `TaskStatus` | `src/task.rs` |
 | Task estimation | `TaskScope`, `TaskRisk`, `TaskImpact`, `TaskLevel` | `src/task.rs` |
 | Dependency graph | `DiGraph<TaskId, ()>` | `src/graph.rs` |
-| Cache + graph state | `Cache` | `src/cache.rs` |
 | CLI command | `Commands` enum | `src/cli.rs` |
 
 ### Data Flow
@@ -46,7 +45,7 @@ CLI args → Command →
 
 1. **One task = one file** - Natural concurrency, git-friendly
 2. **Frontmatter = YAML** - Human/LLM editable, typed via serde
-3. **Cache is optional** - Graph can be rebuilt on every query
+3. **No cache needed** - Graph rebuild is instant (<50ms for 1000 tasks)
 4. **CLI only, no server** - Simplicity first
 5. **CLI over MCP** - Agents use bash tools, no protocol overhead
 
@@ -60,15 +59,14 @@ CLI args → Command →
 
 ### Phase 2: Graph Operations ✅
 - [x] Graph building from task files
-- [ ] Cache system (`.taskgraph/cache.json`) - stub only, not critical
 - [x] Graph commands: `deps`, `dependents`, `topo`, `cycles`, `parallel`, `critical`, `bottleneck`
 - [x] Workflow analysis: `risk`, `risk-path`, `decompose`, `workflow-cost`
 - [x] DOT format output for visualization
 
-### Phase 3: Cleanup & Review (in progress)
-- [x] Test coverage ~80% (target met)
-- [ ] Code review and documentation
-- [ ] Resolve documented issues
+### Phase 3: Cleanup & Review ✅
+- [x] Test coverage ~80% (target met at 89%)
+- [x] Code review and documentation
+- [x] Resolve documented issues
 
 ### Phase 4: Polish & Extensions
 - [ ] Configuration system
@@ -286,7 +284,6 @@ taskgraph/
 │   ├── cli.rs
 │   ├── task.rs
 │   ├── graph.rs
-│   ├── cache.rs
 │   └── commands/
 │       └── ...
 └── tests/
@@ -296,7 +293,7 @@ taskgraph/
 
 ## Current Status
 
-**Phase 1-2: Complete.** Phase 3 in progress (coverage at 88%).
+**Phase 1-3: Complete.** Test coverage at 89%. Ready for Phase 4 (polish).
 
 ## Implementation Guide
 

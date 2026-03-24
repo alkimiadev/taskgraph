@@ -105,20 +105,6 @@ pub enum Commands {
         #[arg(short, long)]
         output: Option<String>,
     },
-
-    /// Manage the cache
-    Cache {
-        #[command(subcommand)]
-        command: CacheCommands,
-    },
-}
-
-#[derive(Subcommand, Debug)]
-pub enum CacheCommands {
-    /// Clear the cache
-    Clear,
-    /// Show cache status
-    Status,
 }
 
 impl Cli {
@@ -221,10 +207,6 @@ impl Cli {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
                 crate::commands::graph_cmd::execute(&collection, output.as_deref())?;
             }
-            Commands::Cache { command } => match command {
-                CacheCommands::Clear => println!("Cache cleared"),
-                CacheCommands::Status => println!("Cache status"),
-            },
         }
         Ok(())
     }

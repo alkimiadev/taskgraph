@@ -2,9 +2,9 @@
 
 ## Objective
 
-Build and analyze dependency graphs. Implement cache for performance.
+Build and analyze dependency graphs.
 
-## Status: ✅ COMPLETE (cache stub only)
+## Status: ✅ COMPLETE
 
 ## Tasks
 
@@ -15,19 +15,7 @@ Build and analyze dependency graphs. Implement cache for performance.
 - [x] Warn on missing dependencies (don't block)
 - [x] Report missing dependencies in `validate`
 
-### 2.2 Cache System ⚠️ PARTIAL
-- [ ] Create `.taskgraph/` directory
-- [ ] Store graph state in `cache.json`
-- [ ] Store file mtimes
-- [ ] Rebuild on file changes (mtime comparison)
-- [x] `taskgraph cache clear` (stub)
-- [x] `taskgraph cache status` (stub)
-
-**Gap**: Cache commands exist but don't persist data. See `docs/issues/cache-not-persisted.md`.
-
-**Recommendation**: Cache not critical for current scale. Revisit if performance becomes an issue.
-
-### 2.3 Graph Commands ✅
+### 2.2 Graph Commands ✅
 
 #### `deps <id>` ✅
 - [x] Show what a task depends on (direct)
@@ -68,7 +56,7 @@ Build and analyze dependency graphs. Implement cache for performance.
 - [x] `--output file.dot` to save
 - [x] Pipe to graphviz: `taskgraph graph | dot -Tpng -o graph.png`
 
-### 2.4 Workflow Analysis Commands ✅
+### 2.3 Workflow Analysis Commands ✅
 
 #### `risk` ✅
 - [x] Show risk distribution (count by level)
@@ -94,7 +82,6 @@ Build and analyze dependency graphs. Implement cache for performance.
 
 | Question | Decision |
 |----------|----------|
-| Cache invalidation | mtime only - fast, good enough |
 | Missing dependency | Warning (don't block iterative building) |
 | Cycle display | Full cycle path: `A → B → C → A` |
 | Parallel grouping | By generation (Kahn's algorithm) |
@@ -106,7 +93,6 @@ Build and analyze dependency graphs. Implement cache for performance.
 | Crate | Purpose |
 |-------|---------|
 | `petgraph` | Graph data structure, algorithms |
-| `serde_json` | Cache serialization |
 | `walkdir` | Directory scanning |
 
 ### Reference Sources (after cargo build)
@@ -134,7 +120,6 @@ petgraph::dot::Dot::new(&graph)                   // DOT format output
 - [x] Parallel generation grouping
 - [x] Critical path calculation
 - [x] Bottleneck identification
-- [ ] Cache rebuild detection (cache stub, not implemented)
 - [x] Risk distribution calculation
 - [x] Workflow EV calculation
 
@@ -142,5 +127,4 @@ petgraph::dot::Dot::new(&graph)                   // DOT format output
 
 - [x] Core graph commands work
 - [x] Cycle detection shows actionable paths
-- [ ] Cache reduces rebuild overhead (not critical for current scale)
-- [ ] Workflow analysis provides useful insights (deferred)
+- [x] Workflow analysis provides useful insights

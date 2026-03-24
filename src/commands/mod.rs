@@ -1,7 +1,6 @@
 //! Command implementations.
 
 pub mod bottleneck;
-pub mod cache_cmd;
 pub mod critical;
 pub mod cycles;
 pub mod decompose;

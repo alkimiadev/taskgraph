@@ -107,7 +107,7 @@ project/
 │   ├── task-two.md
 │   └── ...
 └── .taskgraph/
-    └── cache.json              # Graph cache
+    └── logs/
 ```
 
 ## License

@@ -2,7 +2,6 @@
 //!
 //! See [`taskgraph::Task`] for the core task structure.
 
-pub mod cache;
 pub mod cli;
 pub mod commands;
 pub mod discovery;
@@ -10,7 +9,6 @@ pub mod error;
 pub mod graph;
 pub mod task;
 
-pub use cache::Cache;
 pub use discovery::{DiscoveryError, TaskCollection, ValidationResult};
 pub use error::{Error, Result};
 pub use graph::DependencyGraph;
