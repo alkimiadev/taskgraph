@@ -48,6 +48,7 @@ CLI args → Command →
 2. **Frontmatter = YAML** - Human/LLM editable, typed via serde
 3. **Cache is optional** - Graph can be rebuilt on every query
 4. **CLI only, no server** - Simplicity first
+5. **CLI over MCP** - Agents use bash tools, no protocol overhead
 
 ## Implementation Plan
 
@@ -70,9 +71,10 @@ CLI args → Command →
 - [ ] Resolve documented issues
 
 ### Phase 4: Polish & Extensions
+- [ ] Configuration system
+- [ ] Documentation and shell completion
+- [ ] Performance optimization
 - [ ] File watching (`--watch`)
-- [ ] TUI mode (optional)
-- [ ] MCP server for LLM integration
 - [ ] Distribution (cargo publish, binaries)
 
 ### Semantic Search
@@ -117,12 +119,22 @@ cargo llvm-cov --all-features          # Run with coverage
 cargo llvm-cov --all-features --html   # Generate HTML report
 ```
 
+**Test alongside implementation:** When adding a new command or feature, add tests in the same session. Don't defer testing.
+
 ### Test Categories Required
 
 1. **Happy Path** - Normal usage with valid inputs
 2. **Error Path** - Invalid inputs, missing files, malformed frontmatter
 3. **Graph Operations** - Cycles, missing dependencies, empty graphs
 4. **Roundtrip** - Parse task file → write → parse again → values match
+
+### Test Placement
+
+| Type | Location |
+|------|----------|
+| Unit tests | `#[cfg(test)] mod tests` in same file |
+| Integration tests | `tests/integration/` using `assert_cmd` |
+| Fixtures | `tests/fixtures/` |
 
 ### Documentation Standards
 
@@ -150,6 +162,31 @@ cargo doc --all-features --no-deps     # Build docs
 cargo test --doc --all-features        # Run doc tests
 ```
 
+### Code Quality
+
+**Required before commits:**
+```bash
+cargo clippy -- -D warnings   # Treat warnings as errors
+cargo fmt --check             # Verify formatting
+```
+
+**Fix all warnings** before committing. Do not suppress warnings.
+
+### CLI Consistency
+
+**Path handling:** Commands must use `Cli::tasks_path()` for the tasks directory, not hardcode `./tasks`.
+
+```rust
+// Correct
+let path = cli.tasks_path();
+let collection = TaskCollection::from_directory(&path);
+
+// Wrong
+let collection = TaskCollection::from_directory(PathBuf::from("./tasks"));
+```
+
+**Error handling:** Use `anyhow::Result` and `?` operator. Provide actionable error messages.
+
 ### Commit Strategy
 
 **Make frequent commits** during development:
@@ -157,12 +194,22 @@ cargo test --doc --all-features        # Run doc tests
 - Easier to revert if issues arise
 - Smaller diffs are easier to review
 
+## Pre-Commit Checklist
+
+Before committing changes:
+
+- [ ] `cargo test --all-features` passes
+- [ ] `cargo clippy -- -D warnings` passes
+- [ ] `cargo fmt --check` passes
+- [ ] New code has tests
+- [ ] Public API has documentation
+
 ## Build & Test Commands
 
 ```bash
 cargo build
-cargo test
-cargo clippy
+cargo test --all-features
+cargo clippy -- -D warnings
 cargo fmt --check
 ```
 
@@ -201,7 +248,6 @@ All dependency sources are available locally after `cargo build`:
 When implementing, you can reference the source code for any dependency. For example:
 - `~/.cargo/registry/src/*/petgraph-*/` - graph algorithms
 - `~/.cargo/registry/src/*/gray_matter-*/` - frontmatter parsing
-- `~/.cargo/git/checkouts/model2vec-rs-*/` - embedding model (our fork with `encode_with_stats`)
 
 ## Relevant Files
 
@@ -216,10 +262,9 @@ When implementing, you can reference the source code for any dependency. For exa
 ### End Use Case Reference
 - `/workspace/@alkminer/reference/spec-driven-dev/README.md` - SDD framework that uses TaskGraph
 - `/workspace/@alkminer/reference/spec-driven-dev/prompts/task-decomposer.md` - Agent role spec
+- `/workspace/@alkminer/reference/spec-driven-dev/cost_benefit_analysis_framework.py` - EV formula for workflow-cost
 
 ### Related Projects
-- `/workspace/embedding_service/` - model2vec-rs embedding service
-- `/workspace/model2vec-rs/` - Forked model2vec with token counting
 - `/workspace/@alkimiadev/taskgraph-semantic/` - Semantic search layer (extracted)
 
 ## Directory Structure
