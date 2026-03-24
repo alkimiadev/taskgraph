@@ -175,31 +175,58 @@ LLMs are well-calibrated to categorical estimates, not numeric ones. Use these f
 | `impact` | enum | isolated, component, phase, project | Consequence if task fails |
 | `level` | enum | planning, decomposition, implementation, review, research | Task type |
 
-**Scope → Token Estimates** (environment-dependent):
-| Scope | Approximate Tokens |
-|-------|-------------------|
-| `single` | ~500 |
-| `narrow` | ~1,500 |
-| `moderate` | ~3,000 |
-| `broad` | ~6,000 |
-| `system` | ~10,000+ |
+#### Why Categorical?
 
-**Risk → Success Probability** (for cost-benefit analysis):
-| Risk | Implied p |
-|------|-----------|
-| `trivial` | 0.98 |
-| `low` | 0.90 |
-| `medium` | 0.80 |
-| `high` | 0.65 |
-| `critical` | 0.50 |
+1. **LLM calibration**: Models reliably distinguish "high risk" vs "medium risk" but struggle with numeric estimates
+2. **Environment independence**: Token counts, costs, and model verbosity vary widely
+3. **Relative ordering matters more than precision**: We need to know A > B, not A = $3.42
 
-**Impact → Criticality Weight**:
-| Impact | Weight |
-|--------|--------|
-| `isolated` | 1.0 |
-| `component` | 1.5 |
-| `phase` | 2.0 |
-| `project` | 3.0 |
+#### Structural Insight: Upstream Failures Multiply
+
+The key insight from cost-benefit analysis: **failures at higher levels multiply downstream surface area.**
+
+```
+planning failure → wrong decomposition → wasted implementation
+decomposition failure → unclear tasks → rework  
+review failure → bugs shipped → rework
+```
+
+This means:
+- `risk: critical` at planning level > `risk: critical` at implementation level
+- The `level` field captures position in the hierarchy
+- Upstream tasks should be decomposed more carefully
+
+The workflow analysis commands surface this structure rather than calculating precise dollar amounts.
+
+#### Mappings (for relative comparison)
+
+**Scope → Size Ordering:**
+| Scope | Ordering | Approximate Tokens |
+|-------|----------|-------------------|
+| `single` | 1 | ~500 |
+| `narrow` | 2 | ~1,500 |
+| `moderate` | 3 | ~3,000 |
+| `broad` | 4 | ~6,000 |
+| `system` | 5 | ~10,000+ |
+
+**Risk → Failure Likelihood:**
+| Risk | Ordering | Implied p |
+|------|----------|-----------|
+| `trivial` | 1 | 0.98 |
+| `low` | 2 | 0.90 |
+| `medium` | 3 | 0.80 |
+| `high` | 4 | 0.65 |
+| `critical` | 5 | 0.50 |
+
+**Impact → Downstream Damage:**
+| Impact | Ordering | Weight |
+|--------|----------|--------|
+| `isolated` | 1 | 1.0 |
+| `component` | 2 | 1.5 |
+| `phase` | 3 | 2.0 |
+| `project` | 4 | 3.0 |
+
+**Note**: The numeric values are reasonable defaults for relative comparison. They should not be interpreted as precise measurements.
 
 ## CLI Commands
 
@@ -236,14 +263,25 @@ taskgraph cache clear            # Clear the cache
 taskgraph cache status           # Show cache info (size, age, file count)
 ```
 
-### Workflow Analysis
+### Workflow Analysis (Structural Risk)
+
+These commands surface structural risk patterns rather than precise cost calculations.
 
 ```
 taskgraph risk                   # Show risk distribution across tasks
 taskgraph risk-path              # Highest risk path through graph
 taskgraph decompose-check        # Flag tasks that should be split (risk > medium)
-taskgraph workflow-cost          # Expected cost using cost-benefit framework
+taskgraph workflow-cost          # Relative workflow cost comparison
 ```
+
+| Command | Structural Question |
+|---------|---------------------|
+| `risk` | Where is risk concentrated in the graph? |
+| `decompose-check` | Which upstream tasks should be split? |
+| `risk-path` | Which failure chain has most downstream damage? |
+| `workflow-cost` | Relative comparison - path A vs path B |
+
+**Key insight**: The goal is to identify structural problems (upstream tasks that should be decomposed, high-risk paths) rather than calculate absolute dollar amounts.
 
 ## Dependency Model
 

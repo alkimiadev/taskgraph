@@ -14,67 +14,85 @@ Four workflow analysis commands from phase-2.md were not implemented:
 | `risk` | Show risk distribution across tasks | Not implemented |
 | `risk-path` | Find path with highest cumulative risk | Not implemented |
 | `decompose-check` | Flag tasks that should be split | Not implemented |
-| `workflow-cost` | Calculate expected cost using EV framework | Not implemented |
+| `workflow-cost` | Relative workflow cost comparison | Not implemented |
 
 ## Status
 
 Not blocking - these are independent features that can be added later.
 
+## Design Philosophy
+
+### Structural Analysis, Not Cost Calculation
+
+These commands surface **structural risk patterns** rather than precise dollar amounts:
+
+| Command | Structural Question |
+|---------|---------------------|
+| `risk` | Where is risk concentrated in the graph? |
+| `decompose-check` | Which upstream tasks should be split? |
+| `risk-path` | Which failure chain has most downstream damage? |
+| `workflow-cost` | Relative comparison - path A vs path B |
+
+### Why Relative, Not Absolute?
+
+1. **Token counts vary**: Interface bloat, model verbosity, context window usage
+2. **Prices change**: Model costs vary by provider
+3. **LLM calibration**: Models are reliable at "high vs medium" but not "$3.42 vs $3.50"
+4. **Structural insight matters more**: Upstream failures multiply downstream surface area
+
+### The Key Insight
+
+Failures at higher levels multiply downstream surface area:
+
+```
+planning failure → wrong decomposition → wasted implementation
+decomposition failure → unclear tasks → rework
+review failure → bugs shipped → rework
+```
+
+This means `risk: critical` at planning level > `risk: critical` at implementation level.
+
 ## Design Notes
 
-### Categorical → Continuous Mappings
+### Mappings (for relative ordering)
 
-Already defined in `ARCHITECTURE.md`:
+Defined in `ARCHITECTURE.md`. These preserve ordering, not precision.
 
-**Risk → Success Probability (p):**
-| Risk | p |
-|------|---|
-| trivial | 0.98 |
-| low | 0.90 |
-| medium | 0.80 |
-| high | 0.65 |
-| critical | 0.50 |
+**Risk → Failure Likelihood:**
+| Risk | Ordering | p |
+|------|----------|---|
+| trivial | 1 | 0.98 |
+| low | 2 | 0.90 |
+| medium | 3 | 0.80 |
+| high | 4 | 0.65 |
+| critical | 5 | 0.50 |
 
-**Impact → Criticality Weight:**
-| Impact | Weight |
-|--------|--------|
-| isolated | 1.0 |
-| component | 1.5 |
-| phase | 2.0 |
-| project | 3.0 |
+**Impact → Downstream Damage:**
+| Impact | Ordering | Weight |
+|--------|----------|--------|
+| isolated | 1 | 1.0 |
+| component | 2 | 1.5 |
+| phase | 3 | 2.0 |
+| project | 4 | 3.0 |
 
-### EV Formula
+**Scope → Size:**
+| Scope | Ordering | Approx Cost |
+|-------|----------|-------------|
+| single | 1 | 0.10 |
+| narrow | 2 | 0.30 |
+| moderate | 3 | 0.60 |
+| broad | 4 | 1.20 |
+| system | 5 | 2.00 |
 
-From `cost_benefit_analysis_framework.py`:
+### EV Formula (Reference)
+
+From `cost_benefit_analysis_framework.py`. Used for relative comparison, not absolute $.
 
 ```
 EV_task = P_success × C_success + (1 - P_success) × C_fail
 ```
 
-Where:
-- `P_success = 1 - (1-p)^(r+1)` — probability of success within r+1 attempts
-- `C_success = c + f × E[R|succ]` — cost given eventual success
-- `C_fail = c + r×f + F + t×v` — cost on total failure
-
-**Parameters:**
-| Symbol | Meaning | Default |
-|--------|---------|---------|
-| p | success probability | from risk mapping |
-| r | max retries | 2 |
-| c | cost per attempt | derived from scope |
-| f | retry cost | ≈ c |
-| F | fallback cost | 20 (configurable) |
-| t | hours lost on failure | 0.5 (configurable) |
-| v | value of time ($/hr) | 100 (configurable) |
-
-**Scope → Cost (c):**
-| Scope | Approx Tokens | Est. Cost |
-|-------|---------------|-----------|
-| single | ~500 | $0.10 |
-| narrow | ~1,500 | $0.30 |
-| moderate | ~3,000 | $0.60 |
-| broad | ~6,000 | $1.20 |
-| system | ~10,000+ | $2.00 |
+The formula captures the intuition that failure cost compounds, but the numeric output should be interpreted as relative units, not dollars.
 
 ## Implementation Notes
 
@@ -95,9 +113,8 @@ Where:
 
 ### `workflow-cost` (medium)
 - Implement EV calculation per task
-- Sum across workflow (optionally weighted by criticality)
-- CLI overrides: `--fallback-cost`, `--time-lost`, `--value-rate`
-- Output: total EV in $
+- Sum across workflow (optionally weighted by impact)
+- Output: relative units (not $)
 
 ## Next Steps
 
