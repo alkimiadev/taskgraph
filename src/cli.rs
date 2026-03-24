@@ -93,6 +93,9 @@ pub enum Commands {
     /// Flag tasks that should be decomposed
     Decompose,
 
+    /// Calculate relative workflow cost
+    WorkflowCost,
+
     /// Visualize the dependency graph (DOT format)
     Graph {
         /// Output file (stdout if not specified)
@@ -202,6 +205,10 @@ impl Cli {
             Commands::Decompose => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
                 crate::commands::decompose::execute(&collection)?;
+            }
+            Commands::WorkflowCost => {
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::workflow_cost::execute(&collection)?;
             }
             Commands::Graph { output } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());

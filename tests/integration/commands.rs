@@ -291,6 +291,33 @@ fn test_decompose_command_none_needed() {
 }
 
 #[test]
+fn test_workflow_cost_command() {
+    taskgraph()
+        .arg("-p")
+        .arg("tests/fixtures/risk")
+        .arg("workflow-cost")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Workflow Cost Analysis"))
+        .stdout(predicate::str::contains("TOTAL"))
+        .stdout(predicate::str::contains("relative units"));
+}
+
+#[test]
+fn test_workflow_cost_command_empty() {
+    let temp_dir = tempfile::tempdir().unwrap();
+    let temp_path = temp_dir.path().to_str().unwrap();
+
+    taskgraph()
+        .arg("-p")
+        .arg(temp_path)
+        .arg("workflow-cost")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("No tasks found"));
+}
+
+#[test]
 fn test_help_flag() {
     taskgraph()
         .arg("--help")

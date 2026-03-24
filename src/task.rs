@@ -111,6 +111,17 @@ impl TaskScope {
             Self::System => 10000,
         }
     }
+
+    /// Get relative cost estimate for this scope (ordering value).
+    pub fn cost_estimate(&self) -> f64 {
+        match self {
+            Self::Single => 1.0,
+            Self::Narrow => 2.0,
+            Self::Moderate => 3.0,
+            Self::Broad => 4.0,
+            Self::System => 5.0,
+        }
+    }
 }
 
 impl TaskRisk {

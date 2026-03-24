@@ -14,3 +14,4 @@ pub mod risk;
 pub mod show;
 pub mod topo;
 pub mod validate;
+pub mod workflow_cost;
