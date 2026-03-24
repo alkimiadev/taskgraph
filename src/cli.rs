@@ -96,6 +96,9 @@ pub enum Commands {
     /// Calculate relative workflow cost
     WorkflowCost,
 
+    /// Find path with highest cumulative risk
+    RiskPath,
+
     /// Visualize the dependency graph (DOT format)
     Graph {
         /// Output file (stdout if not specified)
@@ -209,6 +212,10 @@ impl Cli {
             Commands::WorkflowCost => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
                 crate::commands::workflow_cost::execute(&collection)?;
+            }
+            Commands::RiskPath => {
+                let collection = TaskCollection::from_directory(&self.tasks_path());
+                crate::commands::risk_path::execute(&collection)?;
             }
             Commands::Graph { output } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());

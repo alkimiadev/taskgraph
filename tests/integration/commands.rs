@@ -318,6 +318,32 @@ fn test_workflow_cost_command_empty() {
 }
 
 #[test]
+fn test_risk_path_command() {
+    taskgraph()
+        .arg("-p")
+        .arg("tests/fixtures/tasks")
+        .arg("risk-path")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Highest Risk Path"))
+        .stdout(predicate::str::contains("Total risk score"));
+}
+
+#[test]
+fn test_risk_path_command_empty() {
+    let temp_dir = tempfile::tempdir().unwrap();
+    let temp_path = temp_dir.path().to_str().unwrap();
+
+    taskgraph()
+        .arg("-p")
+        .arg(temp_path)
+        .arg("risk-path")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("No tasks found"));
+}
+
+#[test]
 fn test_help_flag() {
     taskgraph()
         .arg("--help")

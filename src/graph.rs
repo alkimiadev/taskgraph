@@ -214,6 +214,77 @@ impl DependencyGraph {
         best_path
     }
 
+    /// Get weighted critical path (path with highest cumulative weight).
+    /// Takes a weight function that maps task IDs to their weight.
+    pub fn weighted_critical_path<F>(&self, weight_fn: F) -> Vec<TaskId>
+    where
+        F: Fn(&str) -> f64,
+    {
+        let endpoints: Vec<_> = self
+            .index_map
+            .keys()
+            .filter(|id| self.dependents(id).is_empty())
+            .collect();
+
+        let mut best_path = Vec::new();
+        let mut best_weight = 0.0;
+
+        for endpoint in endpoints {
+            let (path, weight) = self.weighted_path_to(endpoint, &weight_fn);
+            if weight > best_weight {
+                best_path = path;
+                best_weight = weight;
+            }
+        }
+
+        best_path
+    }
+
+    fn weighted_path_to<F>(&self, target: &str, weight_fn: &F) -> (Vec<TaskId>, f64)
+    where
+        F: Fn(&str) -> f64,
+    {
+        let mut cache: HashMap<TaskId, (Vec<TaskId>, f64)> = HashMap::new();
+        self.weighted_path_to_recursive(target, weight_fn, &mut cache)
+    }
+
+    fn weighted_path_to_recursive<F>(
+        &self,
+        target: &str,
+        weight_fn: &F,
+        cache: &mut HashMap<TaskId, (Vec<TaskId>, f64)>,
+    ) -> (Vec<TaskId>, f64)
+    where
+        F: Fn(&str) -> f64,
+    {
+        if let Some(cached) = cache.get(target) {
+            return cached.clone();
+        }
+
+        let deps = self.dependencies(target);
+        let target_weight = weight_fn(target);
+
+        let result = if deps.is_empty() {
+            (vec![target.to_string()], target_weight)
+        } else {
+            let mut best_dep_path = Vec::new();
+            let mut best_dep_weight = 0.0;
+            for dep in &deps {
+                let (dep_path, dep_weight) = self.weighted_path_to_recursive(dep, weight_fn, cache);
+                if dep_weight > best_dep_weight {
+                    best_dep_path = dep_path;
+                    best_dep_weight = dep_weight;
+                }
+            }
+            let mut path = best_dep_path;
+            path.push(target.to_string());
+            (path, best_dep_weight + target_weight)
+        };
+
+        cache.insert(target.to_string(), result.clone());
+        result
+    }
+
     fn longest_path_to(&self, target: &str) -> Vec<TaskId> {
         let mut cache: HashMap<TaskId, Vec<TaskId>> = HashMap::new();
         self.longest_path_to_recursive(target, &mut cache)
