@@ -4,39 +4,56 @@
 
 Production-ready CLI with distribution.
 
-## Status: ⏳ NOT STARTED
+## Status: 🔄 IN PROGRESS
 
 ## Priority Order
 
 Based on the SDD framework use case:
 
 1. **Documentation** - Required for release
-2. **Distribution** - Final step
+2. **Testing & Quality** - Confidence in correctness
+3. **Distribution** - Final step
 
 ## Tasks
 
-### 4.1 Documentation
-- [ ] README with installation, quick start, examples
-- [ ] Shell completion (bash, zsh, fish) via clap
-- [ ] Example task files
-- [ ] Example workflows (SDD integration)
+### 4.1 Documentation ✅
+
+- [x] README with installation, quick start, examples
+- [x] Shell completions (bash, zsh, fish) via clap_complete
+- [x] Fix doc issues (field name typo, missing fields, phantom dirs)
+- [x] Add "Learn More" links to docs/ in README
 
 ### 4.2 Testing & Quality
-- [ ] Integration tests with example task directories
-- [ ] Property-based tests for parsers
-- [x] Coverage > 80% (achieved in Phase 3)
+
+**Coverage: 89% (from Phase 3)**
+
+- [ ] Unit tests for `task.rs` parsing (`from_markdown`, `from_file`, `to_markdown`, roundtrip)
+- [ ] Unit tests for `calculate_task_ev()` math verification
+- [ ] Unit tests for CLI arg parsing (`cli.rs`)
+- [ ] Property-based tests for parsers (optional — consider value vs dependency cost)
+- [ ] Realistic multi-phase workflow fixture for integration tests
+- [ ] Shared test helpers module (`tests/common/mod.rs`)
 
 ### 4.3 Distribution
-- [ ] Release builds (Linux, macOS, Windows)
-- [ ] Cargo publish
-- [ ] GitHub releases with binaries
+
+- [ ] Cargo publish (dry-run verified)
+- [ ] GitHub releases with binaries (Linux, macOS, Windows)
 - [ ] Homebrew formula (optional)
+- [ ] Verify published crate README renders correctly on crates.io
+
+### 4.4 Extensions (Backlog)
+
+- [ ] Configuration system (TOML)
+- [ ] `--json` output format for scripting
+- [ ] File watching (`--watch`)
+- [ ] Performance optimization (parallel parsing)
 
 ## Success Criteria
 
-- Stable 1.0 release
+- Alpha 0.1.0 published to crates.io
 - Documentation covers common workflows
-- Easy installation via cargo
+- Easy installation via `cargo install taskgraph`
+- Shell completions for bash, zsh, fish
 
 ## Design Notes
 
