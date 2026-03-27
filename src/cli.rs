@@ -58,7 +58,11 @@ pub enum Commands {
     },
 
     /// Validate all task files
-    Validate,
+    Validate {
+        /// Fail on any validation error
+        #[arg(short, long)]
+        strict: bool,
+    },
 
     /// List all tasks
     List {
@@ -167,9 +171,9 @@ impl Cli {
                     &self.tasks_path(),
                 )?;
             }
-            Commands::Validate => {
+            Commands::Validate { strict } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
-                crate::commands::validate::execute(&collection)?;
+                crate::commands::validate::execute(&collection, *strict, self.format)?;
             }
             Commands::List { status, tag } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
@@ -182,7 +186,7 @@ impl Cli {
             }
             Commands::Show { id } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
-                crate::commands::show::execute(&collection, id)?;
+                crate::commands::show::execute(&collection, id, self.format)?;
             }
             Commands::Deps { id } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
