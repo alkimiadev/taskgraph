@@ -55,23 +55,23 @@ pub fn execute(
 }
 
 fn parse_scope(s: &str) -> Option<TaskScope> {
-    match s.to_lowercase().as_str() {
-        "single" => Some(TaskScope::Single),
-        "narrow" => Some(TaskScope::Narrow),
-        "moderate" => Some(TaskScope::Moderate),
-        "broad" => Some(TaskScope::Broad),
-        "system" => Some(TaskScope::System),
+    match s {
+        s if s.eq_ignore_ascii_case("single") => Some(TaskScope::Single),
+        s if s.eq_ignore_ascii_case("narrow") => Some(TaskScope::Narrow),
+        s if s.eq_ignore_ascii_case("moderate") => Some(TaskScope::Moderate),
+        s if s.eq_ignore_ascii_case("broad") => Some(TaskScope::Broad),
+        s if s.eq_ignore_ascii_case("system") => Some(TaskScope::System),
         _ => None,
     }
 }
 
 fn parse_risk(s: &str) -> Option<TaskRisk> {
-    match s.to_lowercase().as_str() {
-        "trivial" => Some(TaskRisk::Trivial),
-        "low" => Some(TaskRisk::Low),
-        "medium" => Some(TaskRisk::Medium),
-        "high" => Some(TaskRisk::High),
-        "critical" => Some(TaskRisk::Critical),
+    match s {
+        s if s.eq_ignore_ascii_case("trivial") => Some(TaskRisk::Trivial),
+        s if s.eq_ignore_ascii_case("low") => Some(TaskRisk::Low),
+        s if s.eq_ignore_ascii_case("medium") => Some(TaskRisk::Medium),
+        s if s.eq_ignore_ascii_case("high") => Some(TaskRisk::High),
+        s if s.eq_ignore_ascii_case("critical") => Some(TaskRisk::Critical),
         _ => None,
     }
 }
