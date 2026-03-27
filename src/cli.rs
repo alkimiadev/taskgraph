@@ -190,7 +190,7 @@ impl Cli {
             }
             Commands::Deps { id } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
-                crate::commands::deps::execute(&collection, id)?;
+                crate::commands::deps::execute(&collection, id, self.format)?;
             }
             Commands::Dependents { id } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
@@ -212,11 +212,11 @@ impl Cli {
             }
             Commands::Topo { status } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
-                crate::commands::topo::execute(&collection, status.as_deref())?;
+                crate::commands::topo::execute(&collection, status.as_deref(), self.format)?;
             }
             Commands::Cycles => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
-                crate::commands::cycles::execute(&collection)?;
+                crate::commands::cycles::execute(&collection, self.format)?;
             }
             Commands::Parallel => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
