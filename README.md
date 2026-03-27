@@ -115,6 +115,39 @@ project/
 - [Framework](docs/framework.md) — Why categorical estimates over numeric costs
 - [Architecture](docs/ARCHITECTURE.md) — Technical design decisions
 
+## Performance
+
+TaskGraph is designed for speed. No caching needed—graph rebuilds are instant:
+
+| Tasks | Load Time | Topo Sort | Cycles | Critical Path |
+|-------|-----------|-----------|---------|---------------|
+| 50 | 3ms | 3ms | 2ms | 8ms |
+| 500 | 19ms | 21ms | 14ms | 52ms |
+| 1,000 | 34ms | 42ms | 26ms | 82ms |
+
+*Benchmarked on AMD EPYC 9004 series. Run `./scripts/benchmark.sh` to verify on your system.*
+
+## Configuration
+
+Create `.taskgraph.toml` in your project root:
+
+```toml
+[project]
+tasks_dir = "tasks"
+```
+
+TaskGraph searches up the directory tree for config files (like git).
+
+## Output Formats
+
+All commands support `--format json` for programmatic use:
+
+```bash
+taskgraph list --format json
+taskgraph show my-task --format json
+taskgraph validate --format json
+```
+
 ## License
 
 Licensed under either of Apache License, Version 2.0 or MIT license at your option.
