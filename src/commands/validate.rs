@@ -4,7 +4,7 @@ use serde::Serialize;
 use std::collections::HashMap;
 
 use crate::cli::OutputFormat;
-use crate::discovery::{DiscoveryError, TaskCollection};
+use crate::discovery::TaskCollection;
 
 /// Validation result for JSON output.
 #[derive(Serialize)]
