@@ -250,14 +250,18 @@ When implementing, you can reference the source code for any dependency. For exa
 - `docs/ARCHITECTURE.md` - Full architecture spec (this is the source of truth)
 
 ### Previous Iterations (Reference)
-- `/workspace/tools/ade_mcp/` - Original MCP-based POC (TypeScript/Deno)
-- `/workspace/tools/ade_mcp/src/core/TaskGraphManager.ts` - Graph operations reference
-- `/workspace/tools/ade_mcp/src/persistence/` - Persistence patterns to avoid
+The CLI-first design was informed by experimentation with MCP-based approaches. Lessons learned:
+- **Tool discovery overhead** - MCP servers require configuration and cognitive load
+- **Latency** - Server startup time adds ~6s per request  
+- **Amortized cost** - Benefits don't justify overhead for this use case
+
+The CLI approach leverages existing bash capabilities with zero overhead.
 
 ### End Use Case Reference
-- `/workspace/@alkminer/reference/spec-driven-dev/README.md` - SDD framework that uses TaskGraph
-- `/workspace/@alkminer/reference/spec-driven-dev/prompts/task-decomposer.md` - Agent role spec
-- `/workspace/@alkminer/reference/spec-driven-dev/cost_benefit_analysis_framework.py` - EV formula for workflow-cost
+TaskGraph is designed to support agent-driven development workflows:
+- **Spec-Driven Development (SDD)** - Tasks represent specifications that agents execute
+- **Workflow Integration** - Commands support task decomposition, execution, and review phases
+- **Cost-Benefit Analysis** - See `docs/research/cost_benefit_analysis_framework.py` for the expected value calculations used in `workflow-cost` command
 
 ## Directory Structure
 

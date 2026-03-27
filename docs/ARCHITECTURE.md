@@ -28,7 +28,7 @@ TaskGraph is designed for AI agent orchestration in software development. Instea
 
 ### SDD Framework Integration
 
-TaskGraph supports the [Spec-Driven Development (SDD) framework](/workspace/@alkminer/reference/spec-driven-dev/README.md) where agents:
+TaskGraph supports the **Spec-Driven Development (SDD)** framework where agents:
 
 1. **Task Decomposition Specialist**: Creates tasks from architecture
     ```bash
