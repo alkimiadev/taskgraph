@@ -147,11 +147,19 @@ pub enum ShellName {
 
 impl Cli {
     /// Get the tasks directory path.
+    /// Priority: CLI arg > config file > default
     pub fn tasks_path(&self) -> PathBuf {
-        self.path
-            .as_ref()
-            .map(PathBuf::from)
-            .unwrap_or_else(|| PathBuf::from("./tasks"))
+        if let Some(path) = &self.path {
+            return PathBuf::from(path);
+        }
+
+        // Check for config file
+        if let Some(config) = crate::config::Config::find_and_load() {
+            return config.tasks_path();
+        }
+
+        // Default
+        PathBuf::from("./tasks")
     }
 
     /// Execute the CLI command.

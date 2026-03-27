@@ -4,10 +4,13 @@
 
 pub mod cli;
 pub mod commands;
+pub mod config;
 pub mod discovery;
 pub mod error;
 pub mod graph;
 pub mod task;
+
+pub use config::Config;
 
 pub use discovery::{DiscoveryError, TaskCollection, ValidationResult};
 pub use error::{Error, Result};
