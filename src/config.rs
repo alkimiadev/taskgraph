@@ -4,19 +4,11 @@ use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
 /// TaskGraph configuration.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Config {
     /// Project configuration.
     #[serde(default)]
     pub project: ProjectConfig,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            project: ProjectConfig::default(),
-        }
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

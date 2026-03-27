@@ -9,18 +9,13 @@ use crate::discovery::TaskCollection;
 use crate::graph::DependencyGraph;
 
 /// Output format for command results.
-#[derive(Clone, Copy, Debug, ValueEnum)]
+#[derive(Clone, Copy, Debug, Default, ValueEnum)]
 pub enum OutputFormat {
     /// Plain text output (default).
+    #[default]
     Plain,
     /// JSON output.
     Json,
-}
-
-impl Default for OutputFormat {
-    fn default() -> Self {
-        Self::Plain
-    }
 }
 
 /// CLI tool for managing task dependencies using markdown files.
