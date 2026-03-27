@@ -8,6 +8,21 @@ use clap_complete::Shell;
 use crate::discovery::TaskCollection;
 use crate::graph::DependencyGraph;
 
+/// Output format for command results.
+#[derive(Clone, Copy, Debug, ValueEnum)]
+pub enum OutputFormat {
+    /// Plain text output (default).
+    Plain,
+    /// JSON output.
+    Json,
+}
+
+impl Default for OutputFormat {
+    fn default() -> Self {
+        Self::Plain
+    }
+}
+
 /// CLI tool for managing task dependencies using markdown files.
 #[derive(Parser, Debug)]
 #[command(name = "taskgraph")]
@@ -16,6 +31,10 @@ pub struct Cli {
     /// Path to tasks directory (default: ./tasks)
     #[arg(short, long, global = true)]
     pub path: Option<String>,
+
+    /// Output format
+    #[arg(short, long, global = true, value_enum, default_value = "plain")]
+    pub format: OutputFormat,
 
     #[command(subcommand)]
     pub command: Commands,
@@ -154,7 +173,12 @@ impl Cli {
             }
             Commands::List { status, tag } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
-                crate::commands::list::execute(&collection, status.as_deref(), tag.as_deref())?;
+                crate::commands::list::execute(
+                    &collection,
+                    status.as_deref(),
+                    tag.as_deref(),
+                    self.format,
+                )?;
             }
             Commands::Show { id } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());

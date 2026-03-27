@@ -1,12 +1,25 @@
 //! List all tasks.
 
+use serde::Serialize;
+
+use crate::cli::OutputFormat;
 use crate::discovery::TaskCollection;
 use crate::task::TaskStatus;
+
+/// Task summary for JSON output.
+#[derive(Serialize)]
+struct TaskSummary {
+    id: String,
+    name: String,
+    status: String,
+    scope: Option<String>,
+}
 
 pub fn execute(
     collection: &TaskCollection,
     status_filter: Option<&str>,
     tag_filter: Option<&str>,
+    format: OutputFormat,
 ) -> crate::Result<()> {
     let tasks: Vec<_> = collection
         .tasks()
@@ -33,26 +46,45 @@ pub fn execute(
         .collect();
 
     if tasks.is_empty() {
-        println!("No tasks found.");
+        match format {
+            OutputFormat::Plain => println!("No tasks found."),
+            OutputFormat::Json => println!("[]"),
+        }
         return Ok(());
     }
 
-    println!("{:<20} {:<12} {:<10} NAME", "ID", "STATUS", "SCOPE");
-    println!("{}", "-".repeat(70));
+    match format {
+        OutputFormat::Plain => {
+            println!("{:<20} {:<12} {:<10} NAME", "ID", "STATUS", "SCOPE");
+            println!("{}", "-".repeat(70));
 
-    for task in tasks {
-        let scope = task
-            .frontmatter
-            .scope
-            .map(|s| s.to_string())
-            .unwrap_or_default();
-        println!(
-            "{:<20} {:<12} {:<10} {}",
-            task.id(),
-            task.status(),
-            scope,
-            task.name()
-        );
+            for task in tasks {
+                let scope = task
+                    .frontmatter
+                    .scope
+                    .map(|s| s.to_string())
+                    .unwrap_or_default();
+                println!(
+                    "{:<20} {:<12} {:<10} {}",
+                    task.id(),
+                    task.status(),
+                    scope,
+                    task.name()
+                );
+            }
+        }
+        OutputFormat::Json => {
+            let summaries: Vec<TaskSummary> = tasks
+                .into_iter()
+                .map(|task| TaskSummary {
+                    id: task.id().to_string(),
+                    name: task.name().to_string(),
+                    status: task.status().to_string(),
+                    scope: task.frontmatter.scope.map(|s| s.to_string()),
+                })
+                .collect();
+            println!("{}", serde_json::to_string_pretty(&summaries)?);
+        }
     }
 
     Ok(())

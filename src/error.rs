@@ -43,6 +43,10 @@ pub enum Error {
     #[error("YAML parsing error: {0}")]
     Yaml(#[from] serde_yaml::Error),
 
+    /// JSON serialization error.
+    #[error("JSON serialization error: {0}")]
+    Json(#[from] serde_json::Error),
+
     /// Graph error.
     #[error("Graph error: {0}")]
     Graph(String),
