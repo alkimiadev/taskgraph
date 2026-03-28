@@ -243,7 +243,7 @@ impl Cli {
             }
             Commands::WorkflowCost => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
-                crate::commands::workflow_cost::execute(&collection)?;
+                crate::commands::workflow_cost::execute(&collection, self.format)?;
             }
             Commands::RiskPath => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());

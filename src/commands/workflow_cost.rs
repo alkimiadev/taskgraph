@@ -1,6 +1,17 @@
 //! Calculate relative workflow cost based on structural risk.
 
+use serde::Serialize;
+
+use crate::cli::OutputFormat;
 use crate::discovery::TaskCollection;
+
+/// Task cost data for JSON output.
+#[derive(Serialize)]
+struct TaskCost {
+    id: String,
+    name: String,
+    cost: f64,
+}
 
 /// Default parameters for EV calculation (relative units).
 const DEFAULT_RETRIES: i32 = 2;
@@ -8,7 +19,7 @@ const DEFAULT_FALLBACK_COST: f64 = 20.0;
 const DEFAULT_TIME_LOST: f64 = 0.5;
 const DEFAULT_VALUE_RATE: f64 = 100.0;
 
-pub fn execute(collection: &TaskCollection) -> crate::Result<()> {
+pub fn execute(collection: &TaskCollection, format: OutputFormat) -> crate::Result<()> {
     let mut task_costs: Vec<(String, String, f64)> = Vec::new();
     let mut total_ev = 0.0;
 
@@ -34,33 +45,53 @@ pub fn execute(collection: &TaskCollection) -> crate::Result<()> {
     }
 
     if task_costs.is_empty() {
-        println!("No tasks found.");
+        match format {
+            OutputFormat::Plain => println!("No tasks found."),
+            OutputFormat::Json => println!("[]"),
+        }
         return Ok(());
     }
 
     task_costs.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal));
 
-    println!("Workflow Cost Analysis ({} tasks):", task_costs.len());
-    println!();
-    println!("{:<20} {:>10} NAME", "ID", "COST");
-    println!("{}", "-".repeat(60));
+    match format {
+        OutputFormat::Plain => {
+            println!("Workflow Cost Analysis ({} tasks):", task_costs.len());
+            println!();
+            println!("{:<20} {:>10} NAME", "ID", "COST");
+            println!("{}", "-".repeat(60));
 
-    for (id, name, cost) in task_costs.iter().take(15) {
-        println!("{:<20} {:>10.2} {}", id, cost, name);
+            for (id, name, cost) in task_costs.iter().take(15) {
+                println!("{:<20} {:>10.2} {}", id, cost, name);
+            }
+
+            if task_costs.len() > 15 {
+                println!("... and {} more", task_costs.len() - 15);
+            }
+
+            println!("{}", "-".repeat(60));
+            println!("{:<20} {:>10.2} (relative units)", "TOTAL", total_ev);
+            println!();
+
+            let avg_ev = total_ev / task_costs.len() as f64;
+            println!("Average per task: {:.2}", avg_ev);
+            println!();
+            println!("Note: Values are relative units for comparison, not dollars.");
+        }
+        OutputFormat::Json => {
+            let costs: Vec<TaskCost> = task_costs
+                .into_iter()
+                .map(|(id, name, cost)| TaskCost { id, name, cost })
+                .collect();
+            let json = serde_json::json!({
+                "tasks": costs,
+                "total": total_ev,
+                "count": costs.len(),
+                "average": total_ev / costs.len() as f64,
+            });
+            println!("{}", serde_json::to_string_pretty(&json)?);
+        }
     }
-
-    if task_costs.len() > 15 {
-        println!("... and {} more", task_costs.len() - 15);
-    }
-
-    println!("{}", "-".repeat(60));
-    println!("{:<20} {:>10.2} (relative units)", "TOTAL", total_ev);
-    println!();
-
-    let avg_ev = total_ev / task_costs.len() as f64;
-    println!("Average per task: {:.2}", avg_ev);
-    println!();
-    println!("Note: Values are relative units for comparison, not dollars.");
 
     Ok(())
 }
