@@ -113,7 +113,14 @@ pub enum Commands {
     Decompose,
 
     /// Calculate relative workflow cost
-    WorkflowCost,
+    WorkflowCost {
+        /// Include completed tasks in analysis
+        #[arg(long)]
+        include_completed: bool,
+        /// Maximum number of tasks to display
+        #[arg(short, long, default_value = "15")]
+        limit: usize,
+    },
 
     /// Find path with highest cumulative risk
     RiskPath,
@@ -241,9 +248,17 @@ impl Cli {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
                 crate::commands::decompose::execute(&collection)?;
             }
-            Commands::WorkflowCost => {
+            Commands::WorkflowCost {
+                include_completed,
+                limit,
+            } => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());
-                crate::commands::workflow_cost::execute(&collection, self.format)?;
+                crate::commands::workflow_cost::execute(
+                    &collection,
+                    self.format,
+                    *include_completed,
+                    *limit,
+                )?;
             }
             Commands::RiskPath => {
                 let collection = TaskCollection::from_directory(&self.tasks_path());

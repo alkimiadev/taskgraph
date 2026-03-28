@@ -4,6 +4,7 @@ use serde::Serialize;
 
 use crate::cli::OutputFormat;
 use crate::discovery::TaskCollection;
+use crate::task::TaskStatus;
 
 /// Task cost data for JSON output.
 #[derive(Serialize)]
@@ -19,11 +20,21 @@ const DEFAULT_FALLBACK_COST: f64 = 20.0;
 const DEFAULT_TIME_LOST: f64 = 0.5;
 const DEFAULT_VALUE_RATE: f64 = 100.0;
 
-pub fn execute(collection: &TaskCollection, format: OutputFormat) -> crate::Result<()> {
+pub fn execute(
+    collection: &TaskCollection,
+    format: OutputFormat,
+    include_completed: bool,
+    limit: usize,
+) -> crate::Result<()> {
     let mut task_costs: Vec<(String, String, f64)> = Vec::new();
     let mut total_ev = 0.0;
 
     for task in collection.tasks() {
+        // Skip completed tasks unless --include-completed is set
+        if !include_completed && task.status() == TaskStatus::Completed {
+            continue;
+        }
+
         let p = task
             .frontmatter
             .risk
@@ -45,8 +56,15 @@ pub fn execute(collection: &TaskCollection, format: OutputFormat) -> crate::Resu
     }
 
     if task_costs.is_empty() {
+        let total_tasks = collection.tasks().count();
         match format {
-            OutputFormat::Plain => println!("No tasks found."),
+            OutputFormat::Plain => {
+                if total_tasks == 0 {
+                    println!("No tasks found.");
+                } else {
+                    println!("All tasks completed.");
+                }
+            }
             OutputFormat::Json => println!("[]"),
         }
         return Ok(());
@@ -56,17 +74,26 @@ pub fn execute(collection: &TaskCollection, format: OutputFormat) -> crate::Resu
 
     match format {
         OutputFormat::Plain => {
-            println!("Workflow Cost Analysis ({} tasks):", task_costs.len());
+            let status_suffix = if include_completed {
+                ""
+            } else {
+                " (pending only)"
+            };
+            println!(
+                "Workflow Cost Analysis ({} tasks){}:",
+                task_costs.len(),
+                status_suffix
+            );
             println!();
             println!("{:<20} {:>10} NAME", "ID", "COST");
             println!("{}", "-".repeat(60));
 
-            for (id, name, cost) in task_costs.iter().take(15) {
+            for (id, name, cost) in task_costs.iter().take(limit) {
                 println!("{:<20} {:>10.2} {}", id, cost, name);
             }
 
-            if task_costs.len() > 15 {
-                println!("... and {} more", task_costs.len() - 15);
+            if task_costs.len() > limit {
+                println!("... and {} more", task_costs.len() - limit);
             }
 
             println!("{}", "-".repeat(60));
@@ -81,6 +108,7 @@ pub fn execute(collection: &TaskCollection, format: OutputFormat) -> crate::Resu
         OutputFormat::Json => {
             let costs: Vec<TaskCost> = task_costs
                 .into_iter()
+                .take(limit)
                 .map(|(id, name, cost)| TaskCost { id, name, cost })
                 .collect();
             let json = serde_json::json!({
